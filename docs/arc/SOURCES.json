@@ -1,0 +1,56 @@
+[
+  {
+    "file": "SKILL.md",
+    "url": "https://uiarc.dev/r/skills/arc/SKILL.md",
+    "bytes": 7510,
+    "sha256": "ff5fe31608a46e031e8dfebe350c85355a2fe46bbda67bafbb778247fcd0e43a"
+  },
+  {
+    "file": "design.md",
+    "url": "https://uiarc.dev/r/skills/arc/design.md",
+    "bytes": 7657,
+    "sha256": "bef6daa6cb0cba3ca137085879e04a822215e5f636ffc2d5ab5db058d9d1ea7f"
+  },
+  {
+    "file": "composition.md",
+    "url": "https://uiarc.dev/r/skills/arc/composition.md",
+    "bytes": 7465,
+    "sha256": "456ff7e68c1d2d70485ee122a800f564ea88a21b5be7fc1cd057daebc95da640"
+  },
+  {
+    "file": "copy.md",
+    "url": "https://uiarc.dev/r/skills/arc/copy.md",
+    "bytes": 3193,
+    "sha256": "f09f88e690957ff25a6cc6c15141a9bbbc1724b3ccc3c96018d8168b027da5a7"
+  },
+  {
+    "file": "motion.md",
+    "url": "https://uiarc.dev/r/skills/arc/motion.md",
+    "bytes": 5299,
+    "sha256": "99d8750bddc1545e3ea28fb8432662d941ed5ce5a753e973986a00ac33e48fdc"
+  },
+  {
+    "file": "accessibility.md",
+    "url": "https://uiarc.dev/r/skills/arc/accessibility.md",
+    "bytes": 3851,
+    "sha256": "9c456fc18184e1b4499e76a289bf8523073cad8797165bd9aeaaefb2497591b2"
+  },
+  {
+    "file": "responsive.md",
+    "url": "https://uiarc.dev/r/skills/arc/responsive.md",
+    "bytes": 2560,
+    "sha256": "ea76bea1fce9a46d73b5234b70c09f867f68d4530c7783da62667c86fe2c8ec3"
+  },
+  {
+    "file": "checklist.md",
+    "url": "https://uiarc.dev/r/skills/arc/checklist.md",
+    "bytes": 4581,
+    "sha256": "272abb09bbc3497f87e7bab891c764614367bdaf3b85b6866e246d367a4ee3ed"
+  },
+  {
+    "file": "components.md",
+    "url": "https://uiarc.dev/r/skills/arc/components.md",
+    "bytes": 10963,
+    "sha256": "b1762e267bfa6da8be9a793ab7d84175b9530baddd5abafd6d97b3dfeede3669"
+  }
+]

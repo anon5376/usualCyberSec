@@ -1,282 +1,89 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { webcrypto } from 'node:crypto';
-import { pathToFileURL } from 'node:url';
+import {webcrypto} from 'node:crypto';
+import {createController, STORAGE_KEY} from '../src/lib/controller.mjs';
+import {createCase, encryptWorkspace} from '../src/lib/core.mjs';
+if(!globalThis.crypto)globalThis.crypto=webcrypto;
+const password='a long test passphrase';
+function fixture(options={}) {
+  const entries=new Map();const downloads=[];const prompts=[];const {confirm:confirmation,...overrides}=options;
+  const storage={getItem:key=>entries.get(key)||null,setItem:(key,value)=>entries.set(key,value),removeItem:key=>entries.delete(key)};
+  const locks={request:async(key,action)=>action()};
+  const app=createController({storage,locks,confirm:message=>{prompts.push(message);return confirmation!==false;},download:(body,name,type)=>downloads.push({body,name,type}),...overrides});
+  app.initialize('#link');
+  return {app,entries,downloads,prompts};
+}
+function incident(app,title='Private title') {app.navigate('#new');app.setDraft('title',title);app.setDraft('summary','Private summary');return app.saveCase();}
 
-test('production app resets report state on every changed report URL and accepts disclosure changes while busy', async () => {
-  const globalNames = ['document', 'window', 'location', 'localStorage', 'navigator', 'FormData', 'DataTransfer', 'crypto', 'setTimeout', 'clearTimeout'];
-  const previousDescriptors = new Map(globalNames.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
-  const nodes = new Map();
-  const documentListeners = new Map();
-  const windowListeners = new Map();
-  let hash = '#overview';
-  const node = selector => {
-    if (!nodes.has(selector)) nodes.set(selector, {
-      innerHTML: '', textContent: '', hidden: false,
-      isConnected: true,
-      classList: { toggle() {} },
-      focus() {}, setAttribute() {}, removeAttribute() {}, reset() {},
-      querySelectorAll() { return [{ disabled: false }]; },
-      querySelector() { return null; },
-    });
-    return nodes.get(selector);
-  };
-  const replacements = {
-    document: {
-    title: '',
-    querySelector: node,
-    getElementById: node,
-    addEventListener(type, handler) { documentListeners.set(type, handler); },
-    },
-    window: {
-    addEventListener(type, handler) { windowListeners.set(type, handler); },
-    scrollTo() {},
-    },
-    location: { get hash() { return hash; }, set hash(value) { hash = value.startsWith('#') ? value : `#${value}`; } },
-    localStorage: {
-      data: new Map(),
-      getItem(key) { return this.data.get(key) ?? null; },
-      setItem(key, value) { this.data.set(key, value); },
-      removeItem(key) { this.data.delete(key); },
-    },
-    navigator: { locks: { async request(_key, callback) { return callback(); } } },
-    crypto: webcrypto,
-    setTimeout: () => 1,
-    clearTimeout: () => {},
-    FormData: class {
-    constructor(form) { this.form = form; }
-    get(key) { return this.form.values?.[key] ?? null; }
-    },
-    DataTransfer: class {
-      constructor() { this.entries = []; this.items = { add: file => this.entries.push(file) }; }
-      get files() { return this.entries; }
-    },
-  };
-  for (const [name, value] of Object.entries(replacements)) {
-    Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
-  }
+test('report disclosure stays controllable during async work and resets across changed URLs and re-entry',async()=>{
+  const {app,downloads}=fixture();const id=incident(app);
+  app.navigate('#report/'+id);assert.equal(app.getSnapshot().report.caseId,id);
+  app.setReport('routeId','youtube-privacy');
+  let release;const busy=app.run(()=>new Promise(resolve=>{release=resolve;}));
+  app.setDisclosure('summary',true);assert.match(app.packet(),/Private summary/);
+  app.setDisclosure('summary',false);assert.doesNotMatch(app.packet(),/Private summary/);
+  release();await busy;
+  app.setDisclosure('summary',true);app.navigate('#cases');app.navigate('#report/'+id);
+  assert.deepEqual(app.getSnapshot().report.disclosure,{});assert.equal(app.getSnapshot().report.routeId,'');
+  app.setReport('routeId','youtube-privacy');app.downloadPacket();assert.doesNotMatch(downloads[0].body,/Private title|Private summary/);
+  app.setDisclosure('summary',true);app.navigate('#report?case='+id);assert.deepEqual(app.getSnapshot().report.disclosure,{});
+  app.navigate('#report/missing');assert.equal(app.getSnapshot().report.caseId,'');assert.throws(()=>app.packet(),/Choose an incident/);
+});
 
-  try {
-    const appUrl = pathToFileURL(new URL('../dist/app.mjs', import.meta.url).pathname);
-    await import(`${appUrl.href}?test=${Date.now()}`);
-    const renderOnHashChange = windowListeners.get('hashchange');
-    const change = documentListeners.get('change');
-    const input = documentListeners.get('input');
-    const submit = documentListeners.get('submit');
-    const click = documentListeners.get('click');
-    const main = node('#main');
-    const storageState = node('#storage-state');
-    const storageEvent = windowListeners.get('storage');
-    const storageKey = 'usualcybersec-vault-v1';
-    assert.equal(storageState.hidden, true);
-    globalThis.localStorage.data.set(storageKey, 'other-tab-ciphertext');
-    storageEvent({ key: storageKey, newValue: 'other-tab-ciphertext' });
-    globalThis.localStorage.data.delete(storageKey);
-    storageEvent({ key: storageKey, newValue: null });
-    assert.equal(storageState.hidden, false);
-    assert.equal(storageState.textContent, 'Saved data changed in another tab');
-    assert.notEqual(storageState.textContent, 'Saved vault locked');
+test('incident and attachment drafts survive routes without mutating committed records',()=>{
+  const {app}=fixture();const first=incident(app,'First');const second=incident(app,'Second');
+  app.setDraft('url','https://expected.example@other.example/');app.setDraft('expected','expected.example');app.setDraft('fingerprint','a'.repeat(64));
+  app.setEdit(first,'title','First draft');app.setEdit(second,'summary','Second draft');
+  app.setAttachment('caseId',first);app.setAttachment('sourceUrl','https://source.example/');app.setAttachment('notes','Original context');
+  app.navigate('#link');app.navigate('#edit/'+first);
+  assert.equal(app.getSnapshot().edits[first].title,'First draft');assert.equal(app.getSnapshot().workspace.cases.find(c=>c.id===first).title,'First');
+  app.cancelEdit(first);assert.equal(app.getSnapshot().edits[first],undefined);assert.equal(app.getSnapshot().edits[second].summary,'Second draft');
+  app.saveCase(second);assert.equal(app.getSnapshot().edits[second],undefined);assert.equal(app.getSnapshot().workspace.cases.find(c=>c.id===second).summary,'Second draft');
+  app.deleteCase(first);assert.equal(app.getSnapshot().attachment.caseId,'');assert.equal(app.getSnapshot().attachment.notes,'Original context');assert.equal(app.getSnapshot().attachment.sourceUrl,'https://source.example/');
+  assert.equal(app.getSnapshot().draft.url,'https://expected.example@other.example/');assert.equal(app.hasDraftWork(),true);
+});
 
-    const form = node('case-form-instance');
-    form.id = 'case-form';
-    form.dataset = { id: '' };
-    form.values = { title: 'Case title', type: 'deepfake', summary: 'summary-secret-during-save', sourceUrl: '' };
-    let buttonDisabled = false;
-    const button = {};
-    Object.defineProperty(button, 'disabled', { get: () => buttonDisabled, set: value => { buttonDisabled = value; } });
-    form.querySelectorAll = () => [button];
-    const submitted = submit({ target: form, preventDefault() {} });
-    await submitted;
-    const caseHash = globalThis.location.hash;
-    assert.match(caseHash, /^#case\//);
-    renderOnHashChange();
-    const caseId = decodeURIComponent(caseHash.slice('#case/'.length));
+test('new incident draft survives navigation and saves only after explicit commit',()=>{
+  const {app}=fixture();app.navigate('#new/impersonation');app.setDraft('title','Draft record');app.setDraft('summary','Notes');app.navigate('#link');app.navigate('#new/breach');
+  assert.equal(app.getSnapshot().draft.type,'impersonation');assert.equal(app.getSnapshot().workspace.cases.length,0);
+  const id=app.saveCase();assert.equal(app.getSnapshot().workspace.cases[0].id,id);assert.equal(app.getSnapshot().draft.title,'');assert.equal(app.getSnapshot().draft.type,'deepfake');
+});
 
-    const saveWorkspace = async () => {
-      const saveForm = node('save-form-instance');
-      saveForm.id = 'save-form';
-      saveForm.values = { password: 'test passphrase long enough', confirm: 'test passphrase long enough' };
-      saveForm.querySelectorAll = () => [button];
-      saveForm.reset = () => {};
-      await submit({ target: saveForm, submitter: { value: 'local' }, preventDefault() {} });
-    };
-    globalThis.location.hash = '#new';
-    renderOnHashChange();
-    const secondCaseForm = node('second-case-form');
-    secondCaseForm.id = 'case-form';
-    secondCaseForm.dataset = { id: '' };
-    secondCaseForm.values = { title: 'Second case', type: 'breach', summary: '', sourceUrl: '' };
-    secondCaseForm.querySelectorAll = () => [button];
-    await submit({ target: secondCaseForm, preventDefault() {} });
-    const secondCaseHash = globalThis.location.hash;
-    const secondCaseId = decodeURIComponent(secondCaseHash.slice('#case/'.length));
-    renderOnHashChange();
-    await saveWorkspace();
+test('late fingerprint cannot replace changed file/reference and async failure remains visible after navigation',async()=>{
+  let release;const {app}=fixture({hashFile:()=>new Promise(resolve=>{release=resolve;})});
+  app.selectFile({name:'a.txt'});const pending=app.run(app.fingerprint);app.navigate('#cases');app.setDraft('fingerprint','a'.repeat(64));release({sha256:'b'.repeat(64)});
+  await assert.rejects(pending,/changed/);assert.equal(app.getSnapshot().evidence,null);assert.match(app.getSnapshot().error,/changed/);assert.equal(app.getSnapshot().busy,false);
+});
 
-    const enterReport = async hash => {
-      globalThis.location.hash = hash;
-      renderOnHashChange();
-    };
-    const fireChange = target => change({ target });
-    const reportControl = (id, value) => ({
-      id,
-      value,
-      checked: true,
-      dataset: {},
-      closest() { return {}; },
-      matches() { return false; },
-    });
+test('real local fingerprint is attached with context and original file is not included in archive',async()=>{
+  const {app,downloads}=fixture();const id=incident(app);const file=new Blob(['abc'],{type:'text/plain'});Object.defineProperties(file,{name:{value:'original.txt'},lastModified:{value:1}});
+  app.selectFile(file);await app.run(app.fingerprint);app.setAttachment('caseId',id);app.setAttachment('notes','Received directly');app.attach();
+  assert.equal(app.getSnapshot().workspace.cases[0].evidence[0].sha256,'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+  assert.equal(app.getSnapshot().attachment.notes,'');await app.save(password,password,'backup');assert.equal(downloads.length,1);assert.doesNotMatch(downloads[0].body,/original.txt|Received directly/);
+});
 
-    await enterReport(`#report/${encodeURIComponent(caseId)}`);
-    assert.match(main.innerHTML, /Choose an official route to prepare a packet/);
-    assert.doesNotMatch(main.innerHTML, /href="#new"|href="#vault"/);
-    assert.match(main.innerHTML, /YouTube · Privacy complaint/);
-    fireChange(reportControl('report-route', 'youtube-privacy'));
-    const summaryToggle = { id: 'disclose-summary', value: '', checked: true, dataset: { reportField: 'summary' }, closest() { return {}; }, matches() { return false; } };
-    fireChange(summaryToggle);
-    assert.match(main.innerHTML, /summary-secret-during-save/);
-    assert.match(main.innerHTML, /data-report-field="summary" checked/);
+test('other-tab event delivered before save requires confirmation and cannot overwrite on refusal',async()=>{
+  const {app,entries,prompts}=fixture({confirm:false});incident(app);await app.save(password,password);
+  const foreign=JSON.stringify(await encryptWorkspace({version:1,cases:[createCase({title:'Other tab'})]},password));entries.set(STORAGE_KEY,foreign);app.storageChanged(foreign);
+  assert.equal(await app.save(password,password),false);assert.equal(entries.get(STORAGE_KEY),foreign);assert.equal(prompts.length,1);assert.equal(app.getSnapshot().vaultChanged,true);
+  entries.delete(STORAGE_KEY);app.storageChanged(null);assert.equal(app.getSnapshot().vaultRaw,null);assert.match(app.getSnapshot().message,/deleted/);
+});
 
-    renderOnHashChange();
-    assert.match(main.innerHTML, /data-report-field="summary" checked/);
+test('deleting last saved incident remains dirty and requires saving an empty workspace',async()=>{
+  const {app}=fixture();const id=incident(app);await app.save(password,password);assert.equal(app.dirty(),false);app.deleteCase(id);assert.equal(app.getSnapshot().workspace.cases.length,0);assert.equal(app.dirty(),true);await app.save(password,password);assert.equal(app.dirty(),false);
+});
 
-    await enterReport('#report');
-    assert.match(main.innerHTML, /href="#new"/);
-    assert.match(main.innerHTML, /href="#vault"/);
-    assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
-    assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
+test('explicit empty archive does not fall back to browser vault; restore and lock clear drafts after confirmation',async()=>{
+  const {app}=fixture();const id=incident(app);await app.save(password,password);app.setEdit(id,'summary','Uncommitted');app.setDraft('url','https://draft.example');app.setAttachment('notes','Pending');
+  await assert.rejects(app.unlock(password,{name:'empty.json',size:0,text:async()=>''}),/empty/);assert.equal(app.getSnapshot().draft.url,'https://draft.example');
+  await app.unlock(password);assert.equal(app.getSnapshot().draft.url,'');assert.deepEqual(app.getSnapshot().edits,{});assert.equal(app.getSnapshot().attachment.notes,'');
+  app.setEdit(id,'title','Another draft');app.lock();assert.equal(app.getSnapshot().workspace.cases.length,0);assert.equal(app.hasDraftWork(),false);assert.equal(app.getSnapshot().vaultRaw!==null,true);
+});
 
-    await enterReport(`#report/${encodeURIComponent(caseId)}`);
-    fireChange(reportControl('report-route', 'youtube-privacy'));
-    fireChange(summaryToggle);
-    await enterReport('#report/missing-case');
-    assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
-    assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
+test('full incident export downloads explicit plaintext notes and context',()=>{
+  const {app,downloads}=fixture();const id=incident(app);app.downloadIncidentReport(id);assert.equal(downloads[0].type,'text/markdown;charset=utf-8');assert.match(downloads[0].body,/Private summary/);assert.match(downloads[0].name,/\.md$/);
+});
 
-    await enterReport(`#report/${encodeURIComponent(caseId)}`);
-    fireChange(reportControl('report-route', 'youtube-privacy'));
-    fireChange(summaryToggle);
-    let releaseRead;
-    const readGate = new Promise(resolve => { releaseRead = resolve; });
-    const file = {
-      name: 'pending.bin', type: 'application/octet-stream', size: 1, lastModified: 1,
-      async arrayBuffer() { await readGate; return new Uint8Array([1]).buffer; },
-    };
-    const hashForm = node('hash-form-instance');
-    hashForm.id = 'hash-form';
-    hashForm.values = { file, expected: '' };
-    hashForm.querySelectorAll = () => [button];
-    const hashing = submit({ target: hashForm, preventDefault() {} });
-    const uncheckedSummary = { ...summaryToggle, checked: false };
-    fireChange(uncheckedSummary);
-    releaseRead();
-    await hashing;
-    renderOnHashChange();
-    assert.doesNotMatch(main.innerHTML, /data-report-field="summary" checked/);
-    assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
-
-    globalThis.location.hash = '#evidence';
-    renderOnHashChange();
-    const attachForm = { id: 'attach-form' };
-    const selectAttachmentCase = { id: 'attach-case', value: caseId, closest() { return null; }, matches() { return false; } };
-    change({ target: selectAttachmentCase });
-    input({ target: { id: 'evidence-source', name: 'sourceUrl', value: 'https://source.example/post', closest(selector) { return selector === 'form' ? attachForm : null; } } });
-    input({ target: { id: 'evidence-notes', name: 'notes', value: 'received from a colleague', closest(selector) { return selector === 'form' ? attachForm : null; } } });
-    globalThis.location.hash = '#library';
-    renderOnHashChange();
-    globalThis.location.hash = '#evidence';
-    renderOnHashChange();
-    assert.match(main.innerHTML, new RegExp(`value="${caseId}" selected`));
-    assert.match(main.innerHTML, /value="https:\/\/source\.example\/post"/);
-    assert.match(main.innerHTML, /received from a colleague/);
-
-    const replacementFile = { name: 'replacement.bin', size: 1, type: 'application/octet-stream', lastModified: 2, async arrayBuffer() { return new Uint8Array([2]).buffer; } };
-    change({ target: { id: 'media-file', files: [replacementFile], closest() { return null; }, matches() { return false; } } });
-    const replacementHashForm = node('replacement-hash-form');
-    replacementHashForm.id = 'hash-form';
-    replacementHashForm.values = { file: replacementFile, expected: '' };
-    replacementHashForm.querySelectorAll = () => [button];
-    await submit({ target: replacementHashForm, preventDefault() {} });
-    renderOnHashChange();
-    assert.doesNotMatch(main.innerHTML, /source\.example\/post|received from a colleague/);
-    assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
-
-    input({ target: { id: 'evidence-source', name: 'sourceUrl', value: 'https://new.example/item', closest(selector) { return selector === 'form' ? attachForm : null; } } });
-    input({ target: { id: 'evidence-notes', name: 'notes', value: 'new acquisition details', closest(selector) { return selector === 'form' ? attachForm : null; } } });
-    const attachSubmit = node('attach-submit-form');
-    attachSubmit.id = 'attach-form';
-    attachSubmit.values = { caseId: secondCaseId, sourceUrl: 'https://new.example/item', notes: 'new acquisition details' };
-    attachSubmit.querySelectorAll = () => [button];
-    await submit({ target: attachSubmit, preventDefault() {} });
-    globalThis.location.hash = `#case/${encodeURIComponent(secondCaseId)}`;
-    renderOnHashChange();
-    assert.match(main.innerHTML, /new\.example\/item/);
-    assert.match(main.innerHTML, /new acquisition details/);
-    globalThis.location.hash = '#evidence';
-    renderOnHashChange();
-    assert.doesNotMatch(main.innerHTML, /new\.example\/item|new acquisition details/);
-
-    let rejectRead;
-    const failingRead = new Promise((_resolve, reject) => { rejectRead = reject; });
-    const failingFile = { name: 'failure.bin', size: 1, type: 'application/octet-stream', lastModified: 3, async arrayBuffer() { await failingRead; } };
-    const lateErrorForm = node('late-error-form');
-    lateErrorForm.id = 'hash-form';
-    lateErrorForm.values = { file: failingFile, expected: '' };
-    lateErrorForm.querySelectorAll = () => [button];
-    const detachedError = { textContent: '', hidden: true, isConnected: false };
-    lateErrorForm.querySelector = () => detachedError;
-    const lateFailure = submit({ target: lateErrorForm, preventDefault() {} });
-    globalThis.location.hash = '#library';
-    renderOnHashChange();
-    rejectRead(new Error('late hash read failed'));
-    await lateFailure;
-    assert.match(node('#notice').textContent, /late hash read failed/);
-    assert.equal(detachedError.textContent, '');
-    await saveWorkspace();
-    change({ target: { id: 'media-file', files: [], closest() { return null; }, matches() { return false; } } });
-    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    const editForm = { id: 'case-form', dataset: { id: caseId } };
-    input({ target: { id: 'case-summary', name: 'summary', value: 'final-edit-draft', closest(selector) { return selector === 'form' ? editForm : null; } } });
-    assert.equal(node('#storage-state').textContent, 'Unsaved draft');
-    let unloadPrevented = false;
-    windowListeners.get('beforeunload')({ preventDefault() { unloadPrevented = true; } });
-    assert.equal(unloadPrevented, true);
-    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    assert.match(main.innerHTML, /summary-secret-during-save/);
-    assert.doesNotMatch(main.innerHTML, /final-edit-draft/);
-    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    assert.match(main.innerHTML, /final-edit-draft/);
-
-    const saveEditForm = node('edit-submit-form');
-    saveEditForm.id = 'case-form';
-    saveEditForm.dataset = { id: caseId };
-    saveEditForm.values = { title: 'Case title', type: 'deepfake', summary: 'final-edit-draft', sourceUrl: '' };
-    saveEditForm.querySelectorAll = () => [button];
-    await submit({ target: saveEditForm, preventDefault() {} });
-    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    assert.match(main.innerHTML, /final-edit-draft/);
-    await saveWorkspace();
-
-    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    input({ target: { id: 'case-summary', name: 'summary', value: 'cancelled-summary-draft', closest(selector) { return selector === 'form' ? editForm : null; } } });
-    click({ target: { closest(selector) { return selector === '[data-action]' ? { dataset: { action: 'cancel-edit', id: caseId } } : null; } } });
-    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
-    renderOnHashChange();
-    assert.match(main.innerHTML, /final-edit-draft/);
-    assert.doesNotMatch(main.innerHTML, /cancelled-summary-draft/);
-
-
-  } finally {
-    for (const [name, descriptor] of previousDescriptors) {
-      if (descriptor) Object.defineProperty(globalThis, name, descriptor);
-      else delete globalThis[name];
-    }
-  }
+test('draft-only lock refusal preserves unsaved work and passphrases never enter controller state',async()=>{
+  const {app,prompts}=fixture({confirm:false});app.setDraft('title','Draft');app.lock();assert.equal(app.getSnapshot().draft.title,'Draft');assert.equal(prompts.length,1);await app.save(password,password,'backup');assert.doesNotMatch(JSON.stringify(app.getSnapshot()),new RegExp(password));
 });

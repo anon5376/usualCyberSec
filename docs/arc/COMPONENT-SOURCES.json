@@ -1,0 +1,104 @@
+[
+  {
+    "file": "src/components/arc/action-button/action-button.module.css",
+    "registry": "https://uiarc.dev/r/action-button.json",
+    "upstreamSha256": "fe09236a2f499755c579bb6f28357f3d44873aa31e138e25981c39c3af0f53ca",
+    "localSha256": "272969513920569c3e89b5823ef85c1e4ebce3623c879c8e46b37e86ac5e5165"
+  },
+  {
+    "file": "src/components/arc/action-button/action-button.tsx",
+    "registry": "https://uiarc.dev/r/action-button.json",
+    "upstreamSha256": "2cb2354db41b0dd06e714a33d138cd83a6d68f12e52a6a6f0f9f85f92d300131",
+    "localSha256": "d304f7cc1721b8a80b55c3dde3a3927ccac1b237ea209e1bac80fa7a9c60a7eb"
+  },
+  {
+    "file": "src/components/arc/button/button.module.css",
+    "registry": "https://uiarc.dev/r/button.json",
+    "upstreamSha256": "77323140c3f9fbad7b08dddba0db7260aa233c34c39a9d24cfa646fea287e140",
+    "localSha256": "9e85dfe713c0a8f889795ef7e3708c44a5ef466bc2accdbb603372c42ba1f6ed"
+  },
+  {
+    "file": "src/components/arc/button/button.tsx",
+    "registry": "https://uiarc.dev/r/button.json",
+    "upstreamSha256": "6a56d78cb75a6fd5f5cfdd03be8b02bf96f0bc96790d3c81abeee10e089fecec",
+    "localSha256": "e4dbdc90ddb53cc7c926a8643461d65101a90f7040d912d653f15f76ab3433ae"
+  },
+  {
+    "file": "src/components/arc/copy-button/copy-button.module.css",
+    "registry": "https://uiarc.dev/r/copy-button.json",
+    "upstreamSha256": "fb107f31c3827db457090da67f5c24f92d088e9ae14d3a8b18ff651fa4760ba6",
+    "localSha256": "2f25d703f09c4b8b784b895bf9e80e891dec594f6f63767fadca73b69500e696"
+  },
+  {
+    "file": "src/components/arc/copy-button/copy-button.tsx",
+    "registry": "https://uiarc.dev/r/copy-button.json",
+    "upstreamSha256": "c345c70cabb29267e3c390ea5aed221289bcfb2697f6e18ac73fbc4b46ef89f8",
+    "localSha256": "10640419548c710cb9d3836d69acf1327e723e4a215a5dd0576b7fe866876aea"
+  },
+  {
+    "file": "src/components/arc/file-dropzone/file-dropzone.module.css",
+    "registry": "https://uiarc.dev/r/file-dropzone.json",
+    "upstreamSha256": "0d1cc9a41e724b04727f3392e29ef588c0211db4745bc87b784da999b03a2ef4",
+    "localSha256": "6824d67f95d640cf906d7c193caaf98563da9947305f05cdcb7d9b8098a3221a"
+  },
+  {
+    "file": "src/components/arc/file-dropzone/file-dropzone.tsx",
+    "registry": "https://uiarc.dev/r/file-dropzone.json",
+    "upstreamSha256": "1702b59c1f5e236733a9761636d25213485cbbd12b7887cc078467638d9dc283",
+    "localSha256": "90ff6563a55d210503e779632d462f38df297083212209f86e1ed38bf1f18cde"
+  },
+  {
+    "file": "src/components/arc/foundation.css",
+    "registry": "https://uiarc.dev/r/arc-foundation.json",
+    "upstreamSha256": "8a7094c7636298d9c8c389d585201c07d1c65b9117c869e6dfc19055cbbdd23d",
+    "localSha256": "9e5840b372b2d5f508150ad5c0547a7b36c7853bfeecd793f4f8aa02bc13ad3f"
+  },
+  {
+    "file": "src/components/arc/input/input.module.css",
+    "registry": "https://uiarc.dev/r/input.json",
+    "upstreamSha256": "ef6716aa7b9f45898859735f416ac932517b94e66bed6b3d23d7aed180529bdf",
+    "localSha256": "6d8c53d2c2402ece99ea206add2bf9799289117f5c4b86a16d4ad9e126f71379"
+  },
+  {
+    "file": "src/components/arc/input/input.tsx",
+    "registry": "https://uiarc.dev/r/input.json",
+    "upstreamSha256": "16a4e761b51482e9c066f284a38171085e71ae390e4b26f9f0c18dd8af21c8f2",
+    "localSha256": "15c6a50b9f53735f9c7f9466e7377036d9798bc2e679c1c414a45021127ddace"
+  },
+  {
+    "file": "src/components/arc/lib/motion-tokens.ts",
+    "registry": "https://uiarc.dev/r/arc-motion-tokens.json",
+    "upstreamSha256": "81235a2bf09738ff9ad8d49ab50631d6a31541838dbc84414f8d97544c2fde73",
+    "localSha256": "71ac604707c667e87fbb4f6bd1abdcb14757188e1eec60a6168de25994354c41"
+  },
+  {
+    "file": "src/components/arc/lib/use-copy-feedback.ts",
+    "registry": "https://uiarc.dev/r/copy-button.json",
+    "upstreamSha256": "88d0ae55bb3e241f529912a4802bbf014e4ba437025acc90ab13e012702273c5",
+    "localSha256": "74b19e6b1ae13f72e39da56d483e1f95f4fa96759661f93aa02b66ae9015afa5"
+  },
+  {
+    "file": "src/components/arc/password-field/password-field.module.css",
+    "registry": "https://uiarc.dev/r/password-field.json",
+    "upstreamSha256": "75a61ff590b700812e5f62af47f7dc268b807e109ad570d4d990e7d62ed5204f",
+    "localSha256": "439758199a02a0a41a7d43f41842ea5f052e94597628bd568d948bbfd9e23689"
+  },
+  {
+    "file": "src/components/arc/password-field/password-field.tsx",
+    "registry": "https://uiarc.dev/r/password-field.json",
+    "upstreamSha256": "2064f0f2d6ab79aa34c82f67e6e68464ae062435cb69ede3314bd199ae84f35a",
+    "localSha256": "b7760371a45511242be5f01804f3e844e4377a450bbc8fec1fbd83c0613dfab5"
+  },
+  {
+    "file": "src/components/arc/textarea/textarea.module.css",
+    "registry": "https://uiarc.dev/r/textarea.json",
+    "upstreamSha256": "57a9294f6f7eea903296334bf1203982b41736aa1082a83af4dc2e8bbc6a144c",
+    "localSha256": "2b71662981be8c642c20ef0828c4db39b159e742fd504352cfc5dad939cc3222"
+  },
+  {
+    "file": "src/components/arc/textarea/textarea.tsx",
+    "registry": "https://uiarc.dev/r/textarea.json",
+    "upstreamSha256": "1ed43b87e45b04180f1c6b8b3b7543e071bed3a6fcb2033e98015c77a8b7135a",
+    "localSha256": "306ca46f9b7a7b7618b28440d14576e87631d7b5282b010cf09ccd442ff02ebe"
+  }
+]

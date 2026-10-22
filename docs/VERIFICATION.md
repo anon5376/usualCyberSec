@@ -86,3 +86,14 @@ Checked 2026-10-22. A fresh Claude Opus 5.5 session implemented the accepted whi
 - Home screenshots were inspected at 1440px, 768px, and 390px, with document width matching each viewport. The report also matched a 320px viewport. No browser warning/error logs appeared during these checks. These checks do not constitute screen-reader validation or a complete browser matrix.
 
 Browser file selection and download completion were not repeated; the unchanged hashing and export logic remain covered by native tests. Publication, hosted CI, archive reproducibility, and deployed-byte checks are recorded in the release receipt.
+
+## React and Arc interface (0.7)
+
+Checked 2026-10-22. The implementation uses React 19, TypeScript, Vite and Arc UI source under the retained MIT license. This is local verification of the current candidate; it does not establish hosted CI or a new deployment.
+
+- `npm run build` passed. `npm test` passed 29/29 Node tests. The root runner passed `python3 -m unittest tests/server_test.py tests/package_test.py` with 3 Python tests. A subsequent sandboxed retry of `npm run test:server` could not bind its localhost socket (`PermissionError: [Errno 1] Operation not permitted`) and stopped before behavior assertions; the root-run result is the verification evidence.
+- Browser review covered the direct tool layout at 1440px desktop and 390px mobile. The document fit each viewport without horizontal overflow.
+- Synthetic data checks covered URL and file workflows, draft retention, attachment, checklist persistence, encrypted workspace save/reload/unlock, and the known SHA-256 result for the three bytes `abc`: `ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`.
+- The accepted lock flow cleared all three passphrase controls. A Google account-recovery packet was downloaded as plaintext using synthetic incident data; optional fields were off by default, and changing the route reset those selections.
+- The checks used no real incident data. GitHub-hosted CI and deployment of this candidate remain unverified; record those results and receipts separately.
+- Hosted CI and deployment of this candidate remain unverified; record those results and receipts separately.

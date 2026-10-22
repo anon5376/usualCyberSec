@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { locks } from 'node:worker_threads';
-import { isWorkspaceDirty, readArchiveInput, saveCiphertext } from '../dist/vault.mjs';
+import { isWorkspaceDirty, readArchiveInput, saveCiphertext } from '../src/lib/vault.mjs';
 
 test('deleting the last saved case remains an unsaved change', () => {
   const empty = {version:1,cases:[]};

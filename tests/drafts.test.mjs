@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {emptyDraft, startIncidentDraft, hasPendingDrafts} from '../dist/drafts.mjs';
+import {emptyDraft, startIncidentDraft, hasPendingDrafts} from '../src/lib/drafts.mjs';
 
 test('recovery route initializes the incident category without overwriting an existing draft',()=>{
   const draft=startIncidentDraft(emptyDraft(),'phishing');

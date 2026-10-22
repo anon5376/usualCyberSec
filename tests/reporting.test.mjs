@@ -6,7 +6,7 @@ import {
   buildReportingPacket,
   findReportingRoutes,
   getReportingRoute,
-} from '../dist/reporting.mjs';
+} from '../src/lib/reporting.mjs';
 
 const routeCase = {
   id: 'case-1',

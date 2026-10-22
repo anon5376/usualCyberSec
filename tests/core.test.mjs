@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { webcrypto } from 'node:crypto';
-import { analyzeUrl, createCase, decryptWorkspace, encryptWorkspace, exportReport, hashFile, validateWorkspace } from '../dist/core.mjs';
+import { analyzeUrl, createCase, decryptWorkspace, encryptWorkspace, exportReport, hashFile, validateWorkspace } from '../src/lib/core.mjs';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 

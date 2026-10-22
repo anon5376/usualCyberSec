@@ -1,48 +1,52 @@
 # Files and scripts
 
-## Public website files
+## Application and build
 
-Cloudflare Pages serves `dist/` directly. This is a static site with five browser JavaScript modules, no framework and no build step. The header links to Home, Check a link, Fingerprint a file, Incidents and Guides, plus Your data with the save status. Home presents six situation-based response paths, a working link checker and the other tools.
+The React and TypeScript application starts at `src/main.tsx`; `src/styles.css` defines the application layout. `src/lib/controller.mjs` connects the interface to the state logic. Four framework-independent modules remain in `src/lib/`: `core.mjs`, `drafts.mjs`, `reporting.mjs` and `vault.mjs`. Arc-derived components, their styles and helpers live under `src/components/arc/`. The root `index.html` is the Vite entry page, `vite.config.mjs` configures the build, and `tsconfig.json` holds the TypeScript settings.
 
-| File | Purpose |
+| Path | Purpose |
 |---|---|
-| `dist/index.html` | The page shell, navigation containers, stylesheet and JavaScript entry point. |
-| `dist/styles.css` | Plain responsive layout, colors, forms and keyboard focus. |
-| `dist/app.mjs` | Page routing, rendered screens, form actions, downloads and browser events. |
-| `dist/core.mjs` | File hashing, URL checks, incident validation, response steps, full reports and encryption/decryption. |
-| `dist/drafts.mjs` | Draft initialization and unsaved-input checks. |
-| `dist/vault.mjs` | Encrypted browser storage, archive reads and protection against conflicting tab writes. |
-| `dist/reporting.mjs` | Official reporting/recovery routes and selective plain-text reporting packets. |
-| `dist/icon.svg` | Browser-tab favicon. |
-| `dist/_headers` | Cloudflare security-header configuration; it is not an executable script. |
-| `dist/usualcybersec-source.zip` | Generated MIT source download; excluded from Git because it can be rebuilt. |
+| `src/main.tsx`, `src/styles.css` | React entry point and application layout. |
+| `src/lib/controller.mjs` | Application state and action coordination. |
+| `src/lib/core.mjs`, `src/lib/drafts.mjs`, `src/lib/reporting.mjs`, `src/lib/vault.mjs` | Existing framework-independent validation, draft, reporting and encrypted-storage logic. |
+| `src/components/arc/` | Arc-derived React controls, styles and local helpers. |
+| `src/modules.d.ts` | Type declarations for JavaScript modules used by TypeScript. |
+| `public/` | Static files copied to the built site, including `_headers`, the icon and local fonts. |
+| `public/fonts/OFL-*.txt` | Font license texts for the bundled font files. |
+| `public/third-party-licenses.txt` | Runtime dependency license texts served with the built site. |
+| `docs/arc/SOURCES.json`, `docs/arc/COMPONENT-SOURCES.json` | Arc skill and component source receipts. |
+| `index.html`, `vite.config.mjs`, `tsconfig.json` | Root HTML entry, Vite configuration and TypeScript settings. |
+| `package.json`, `package-lock.json` | Project commands and pinned dependency versions. |
+| `THIRD_PARTY_NOTICES.md`, `LICENSE.arc` | Third-party attribution and the retained Arc MIT license. |
+| `dist/` | Generated production build output. Recreate it with `npm run build`; it is not the application source. |
 
-`index.html` loads `app.mjs`, which imports the other four `.mjs` files. These are ordinary JavaScript ES modules. Home, the link checker, file fingerprinting, incidents, guides, response pages, reporting and the vault are screens in the same page, selected by URL fragments such as `#overview`, `#link`, `#evidence`, `#cases`, and `#vault`. There is no backend application, database or evidence-upload endpoint.
+Vite emits the static site into `dist/`. Cloudflare Pages serves that directory. The local preview server also serves `dist/`, and does not build it automatically.
 
 ## Local and development files
 
 | File or directory | Purpose |
 |---|---|
-| `scripts/serve.py` | Python standard-library preview server, bound only to localhost. It is not running on Pages. |
+| `scripts/serve.py` | Python standard-library preview server, bound only to localhost. |
 | `scripts/package.py` | Builds the reproducible source ZIP from an allowlist. |
-| `package.json` | Project metadata and convenient commands; no package dependencies are declared. |
-| `tests/*.test.mjs` | Node tests for app events, crypto, URLs, records, drafts, storage and packets. |
-| `tests/server_test.py` | Local static-server tests. |
-| `tests/package_test.py` | Source-archive inclusion and exclusion tests. |
-| `.github/workflows/ci.yml` | GitHub Actions checks on pushes and pull requests. |
+| `tests/` | Node tests for application behavior and Python tests for the server and source archive. |
+| `.github/workflows/ci.yml` | GitHub Actions build, application, server and package checks. |
 | `.gitignore` | Excludes generated archives, credentials, local caches and release receipts. |
 | `README.md` | Setup, capabilities, limitations and project links. |
-| `LICENSE` | MIT license. |
+| `LICENSE` | Project MIT license. |
 | `SECURITY.md`, `CONTRIBUTING.md` | Security-reporting boundaries and contribution instructions. |
 | `PRODUCT.md`, `DESIGN.md`, `docs/` | Product requirements, visual rules, sources, privacy, tests and release notes. |
+
+The source ZIP preserves application source, static public files, the npm lockfile, build configuration, project license and third-party notices. It excludes `node_modules/`, credentials, `.env` files, ignored release outputs, generated `dist/` files and source maps.
 
 ## Commands
 
 | Command | Runs |
 |---|---|
-| `npm run serve` | `python3 scripts/serve.py` |
-| `npm test` | `node --test tests/*.test.mjs` |
-| `npm run test:server` | `python3 -m unittest tests/server_test.py` |
-| `npm run package:source` | `python3 scripts/package.py` |
+| `npm ci` | Installs React, Arc runtime dependencies, Vite and TypeScript at locked versions. |
+| `npm run build` | Type-checks and builds the static application into `dist/`. |
+| `npm run serve` | Runs `python3 scripts/serve.py` against the existing build. |
+| `npm test` | Runs the Node application tests. |
+| `npm run test:server` | Runs `python3 -m unittest tests/server_test.py`. |
+| `npm run package:source` | Runs `python3 scripts/package.py`. |
 
-No `npm install` is needed. Python 3 is used for local serving/packaging; Node.js 24.5 or later is used for the tests. Visitors only need a supported browser over HTTPS.
+Python 3 is used for local serving and packaging. Node.js 24 or later is used for installation, building and application tests. Visitors only need a supported browser over HTTPS.
