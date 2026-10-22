@@ -26,3 +26,15 @@ The user requested a design brief, clearer workflows, ASCII details and design-s
 - Browser file-chooser automation stalled for approximately 32 minutes before completing. This was a tooling delay; no product performance claim is inferred.
 
 The final reviewer reran the asynchronous file-switch reproduction after the operation-token fix: the previous file's late hash is discarded. Tablet width 768px and phone width 390px both matched their document width, with the primary action visible. The rendered font was confirmed loaded locally.
+
+## Reporting and recovery release (0.3)
+
+Checked 2026-10-22. `npm test` passed 19/19; `npm run test:server` passed 2/2; `python3 -m unittest tests/package_test.py` passed 1/1. Syntax and authored diff checks passed. No new runtime or development dependency was added.
+
+- Packet tests cover default suppression, independent disclosure choices, inherited-option rejection, quoted multiline/control-character inputs, compatible routes and invalid options. A production-app integration test runs the actual submit/change/hashchange handlers: reporting changes remain effective during an in-flight hash, changed or unresolved report URLs clear previous selections, and same-route rerenders retain deliberate choices. The new integration test failed against the old route behavior; restoring the old busy guard also made it fail.
+- Independent review found the busy-operation disclosure mismatch and stale private packet on unresolved routes. Both were fixed, and the reviewer reran the seven targeted reporting tests successfully with no remaining material finding in that scope.
+- Browser checks used synthetic case values. Default packet preview excluded title, summary and URL; selecting title included only title; changing service reset all disclosure choices. A fresh tab verified short platform labels, case-to-report navigation and clearing the previous summary on re-entering the generic reporting guide. The no-case account-recovery filter exposed Google and Microsoft guidance without a packet.
+- Desktop and 390px reporting layouts were inspected. Phone document width was 390px, matching its viewport. No warning/error console messages were observed. Browser download controls were inspected; a completed report-file download was not claimed in this release check. The packet text and app event path are covered by native tests.
+- Source notes retain official URLs and access caveats. No account recovery, platform submission, identity-document upload or takedown was performed. No automated detector or C2PA verification is introduced by this release.
+
+Public deployment availability and byte equality are retained separately in the local release receipt.
