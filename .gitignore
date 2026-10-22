@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+node_modules/
+dist/*.zip
+dist/*.zip.tmp
+.openai/
+.impeccable/
+releases/
+.env
+.env.*
+*.pem
+*.key
+credentials/
+secrets/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
