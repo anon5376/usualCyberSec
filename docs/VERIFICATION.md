@@ -15,3 +15,14 @@ Checked 2026-10-22. These are local release checks, not a security certification
 Browser automation here is a retained manual QA record, not an executable end-to-end CI suite. GitHub-hosted CI has not run. Cross-browser, assistive-technology, penetration, detector-accuracy and real-incident testing are not established. This release has no AI detector, C2PA signature verifier, automated account monitoring, or takedown service. Source and runtime make those limits explicit.
 
 Deployment receipts and public availability must be checked independently from local tests. See RELEASE.md for the procedure.
+
+## Workbench redesign verification
+
+The user requested a design brief, clearer workflows, ASCII details and design-skill research. The brief records the current Taste Skill app-screen guidance and Google design-system reference. No external skill scripts or Stitch generation ran.
+
+- The redesigned opening screen contains an actual file input; all four global destinations are visible at 390px. Desktop and 390px screenshots were inspected, with no horizontal document overflow. Space Grotesk and IBM Plex Mono are self-hosted with OFL licenses.
+- Browser checks confirmed URL drafts survive switching tools, deceptive-hostname review still works, selected files survive tool switching, the `abc` fixture hashes correctly, and direct password recovery opens without creating a case.
+- Review found route-category loss and draft-discard gaps. New production draft-state helpers protect both. Native tests now pass 12/12; the category fix was also observed through the browser. Native confirmation automation timed out, so the discard confirmation is covered by code review and state tests rather than a claimed completed browser-dialog test.
+- Browser file-chooser automation stalled for approximately 32 minutes before completing. This was a tooling delay; no product performance claim is inferred.
+
+The final reviewer reran the asynchronous file-switch reproduction after the operation-token fix: the previous file's late hash is discarded. Tablet width 768px and phone width 390px both matched their document width, with the primary action visible. The rendered font was confirmed loaded locally.

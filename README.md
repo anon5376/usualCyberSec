@@ -28,4 +28,4 @@ Session data may disappear when the tab closes. Encrypted browser storage and ex
 
 ## Project status
 
-Version 0.1 is an initial incident-response toolkit. The site includes a downloadable MIT source archive. A canonical GitHub repository is pending owner approval. Read [the executed verification record](docs/VERIFICATION.md), [remaining work](docs/ROADMAP.md), [privacy notes](docs/PRIVACY.md), and [threat model](docs/THREAT-MODEL.md) for the supported behavior and its limits.
+Version 0.2 adds the action-first workbench, preserved tool drafts, direct recovery guidance, and a unified responsive design. The site includes a downloadable MIT source archive. A canonical GitHub repository is pending owner approval. Read [the executed verification record](docs/VERIFICATION.md), [remaining work](docs/ROADMAP.md), [privacy notes](docs/PRIVACY.md), and [threat model](docs/THREAT-MODEL.md) for the supported behavior and its limits.
