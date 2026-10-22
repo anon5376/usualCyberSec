@@ -62,3 +62,15 @@ Checked 2026-10-22. The owner authorized a public repository named usualCyberSec
 - A pre-publication scan of 61 historical text blobs found no matches for the checked credential signatures, and no private/generated release paths were tracked. This is a bounded publication check, not a complete secret or security audit.
 
 GitHub push, hosted CI and the Pages byte-comparison result are retained in the release receipt. A workflow file alone does not establish passing hosted CI. The private vulnerability-report setting remains disabled pending explicit approval.
+
+## Task-first interface (0.5)
+
+Checked 2026-10-22. The start page now leads with response situations and a working local link check. Tools, incident records, reporting, and the vault share the same responsive layout. No dependencies were added.
+
+- `npm test`: 20/20 passed. Python server and source-package tests: 3/3 passed. The production-app test passed again after the final storage-status fix. Authored diff checks passed; the static Impeccable scan returned no findings.
+- Browser checks exercised the account-compromise response path, created a synthetic breach incident, and prepared its Google recovery packet. Optional fields began unchecked; selecting the summary included it while leaving the title out. No real incident information was used or submitted.
+- The homepage link checker identified credentials in a test URL and displayed its actual destination hostname. Its URL and optional expected domain survived navigation to Tools; the comparison remained expanded when a domain was present. Save data opened the vault with its correct page title and no incorrect active navigation item.
+- Desktop, 768px tablet, and 390px phone home screenshots were inspected. Home, link tools, and vault document widths matched a 320px viewport; the reporting document matched a 390px viewport. Mobile navigation targets measured at least 44px in both dimensions. No browser warning/error logs were observed during these checks. This does not claim a screen-reader or complete browser-matrix evaluation.
+- Independent review found no blocking visual issue in the five supplied home/report captures. It found a two-tab status regression: after another tab saved and deleted a vault, an empty tab could claim a saved vault was locked. The production storage-handler regression failed on that old behavior and passed after adding an explicit changed-in-another-tab state. The reviewer marked that finding resolved.
+
+File hashing and encryption were covered by the native suite; browser file selection, encrypted saving, and report-file downloads were not repeated in this design pass. Publication and asset-byte checks are retained separately in the release receipt.

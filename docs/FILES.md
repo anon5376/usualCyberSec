@@ -2,7 +2,7 @@
 
 ## Public website files
 
-Cloudflare Pages serves `dist/` directly. This is a static site with five browser JavaScript modules, no framework and no build step.
+Cloudflare Pages serves `dist/` directly. This is a static site with five browser JavaScript modules, no framework and no build step. The header exposes Start, Tools, Incidents, and Guides plus Save data. Start presents the four situation-based response plans, urgent password/payment routes, a link checker, and a secondary fingerprint action.
 
 | File | Purpose |
 |---|---|
@@ -17,7 +17,7 @@ Cloudflare Pages serves `dist/` directly. This is a static site with five browse
 | `dist/_headers` | Cloudflare security-header configuration; it is not an executable script. |
 | `dist/usualcybersec-source.zip` | Generated MIT source download; excluded from Git because it can be rebuilt. |
 
-`index.html` loads `app.mjs`, which imports the other four `.mjs` files. These are ordinary JavaScript ES modules. Cases, guides, file/link checks and the vault are screens in the same page, selected by URL fragments such as `#cases` and `#vault`. There is no backend application, database or evidence-upload endpoint.
+`index.html` loads `app.mjs`, which imports the other four `.mjs` files. These are ordinary JavaScript ES modules. Start, Tools, Incidents, Guides, response pages, and the vault are screens in the same page, selected by URL fragments such as `#overview`, `#tools`, `#cases`, and `#vault`. There is no backend application, database or evidence-upload endpoint.
 
 ## Local and development files
 

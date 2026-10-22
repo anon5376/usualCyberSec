@@ -65,6 +65,17 @@ test('production app resets report state on every changed report URL and accepts
     const submit = documentListeners.get('submit');
     const click = documentListeners.get('click');
     const main = node('#main');
+    const storageState = node('#storage-state');
+    const storageEvent = windowListeners.get('storage');
+    const storageKey = 'usualcybersec-vault-v1';
+    assert.equal(storageState.hidden, true);
+    globalThis.localStorage.data.set(storageKey, 'other-tab-ciphertext');
+    storageEvent({ key: storageKey, newValue: 'other-tab-ciphertext' });
+    globalThis.localStorage.data.delete(storageKey);
+    storageEvent({ key: storageKey, newValue: null });
+    assert.equal(storageState.hidden, false);
+    assert.equal(storageState.textContent, 'Saved data changed in another tab');
+    assert.notEqual(storageState.textContent, 'Saved vault locked');
 
     const form = node('case-form-instance');
     form.id = 'case-form';
