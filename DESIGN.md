@@ -1,36 +1,55 @@
 # usualCyberSec interface
 
-usualCyberSec is a practical response desk. Its first screen asks, “Start with what happened.” People who are worried or in a hurry see a response path immediately, with the link checker available on that same screen.
+usualCyberSec should look like a careful, plain web page that a student who codes well would build for friends and family: one centred column, black text on white, ordinary controls, and nothing that needs explaining. People arrive worried. The page asks what is going on, offers clear choices, and keeps every tool one click away.
 
-## Shell and hierarchy
+## The one idea
 
-Use a compact horizontal header with the product name, four destinations—Start, Tools, Incidents, and Guides—and a visible Save data action. Start leads with four response situations: impersonation, suspected synthetic media, account compromise, and phishing. Urgent password-sharing and payment paths sit next to those choices. A suspicious-link review stays in the first screen; file fingerprinting is a secondary utility. Recent incidents appear only when real cases exist.
+A highlighter. The most important fact in a suspicious link is the part that decides where it goes: the hostname. The link checker shows the destination large and marks it in highlighter yellow inside the full address, so a brand name in the wrong place is easy to spot. The same yellow marks the current page in the navigation, the hover on a choice, the favicon, and anything still waiting for you (an open incident, unsaved changes). Yellow never means "safe".
 
-Tools hold the dedicated file and link workflows. Incidents hold the session's factual records and response steps. Guides contain the resource library and official reporting/recovery directory. The vault remains the place to encrypt, save, unlock, export, or erase data.
+## Layout
+
+- One header row: the wordmark with its yellow "u" mark, five plain links (Home, Check a link, Fingerprint a file, Incidents, Guides) and, on the right, the save status and "Your data". On phones the links wrap onto a second row; every target is at least 44px tall.
+- One centred column, up to 960px of content, with equal margins (24px, 16px on phones). Text runs to about 62–68 characters per line.
+- Pages that need a second column (incident detail, new incident, response steps, your data) use a main column plus a 300px grey side panel; reporting uses two equal columns. Below 860px everything stacks into one column in reading order.
+- Every screen has one `h1` that says what it is. Sections are separated by space (56px), not boxes.
+
+## Home
+
+1. `h1` "Help with scams, fakes and hacked accounts", with one sentence on privacy.
+2. "What's going on?" — six plain choices in a two-column grid: someone pretending to be me, possibly fake media, someone got into my account, I clicked a link or gave out a password, I sent money, something else or not sure. Each opens its response steps; the last opens the guides.
+3. Your incidents, only when real incidents exist in this tab.
+4. "Check a link without opening it" — the working link checker on a light grey band.
+5. More tools — file fingerprint, incident record, report or recover, save or unlock — as four text links with one line each.
 
 ## Visual system
 
-Use a cool, light surface that reads clearly in a browser at home or under office lighting. The page ground is pale blue-grey; work areas are white. Navy carries text, cobalt marks navigation and the primary action, and warning or danger colors appear only when their meanings apply. Separate sections with a thin border and consistent spacing. Do not add chart-like metrics, fake activity, shadows, gradients, or decorative security motifs.
-
 | Role | Value |
 |---|---|
-| Page | `#f6f8fb` |
-| Surface | `#ffffff` |
-| Main text | `#192330` |
-| Muted text | `#596779` |
-| Border | `#dce2ea` |
-| Primary blue | `#2457d6` |
-| Hover blue | `#1946b5` |
-| Soft blue | `#eef3ff` |
-| Warning | `#fff4d9` with `#654800` text |
-| Danger | `#9f2b27` |
+| Page | `#ffffff` |
+| Ink (headings, buttons) | `#161616` |
+| Body text | `#2b2b2b` |
+| Secondary text | `#575757` |
+| Lines | `#e0e0e0` |
+| Control borders | `#8c8c8c` |
+| Grey band and side panels | `#f4f4f2` |
+| Highlighter | `#ffd84d` |
+| Soft highlighter (status, warnings) | `#fff4c4`, edge `#b88a00` |
+| Match / resolved | `#e4f2e9` with `#1d6440` |
+| Danger | `#b3261e` |
 
-Use the operating-system sans-serif stack. Keep ordinary HTML controls, labels above fields, readable focus rings, and consistent button shapes. The header wordmark is plain text; the favicon uses the simple blue U-and-check mark. No external fonts, UI framework, component registry, or animation library is part of the application.
+- Type: the operating system's sans-serif (`system-ui`). Sizes: 32px page titles (26px on phones), 21px section headings, 16–18px text, 14–15px notes. A monospace face only for real machine text: SHA-256 digests, the full URL being checked, and the packet preview.
+- Buttons: near-black fill with white text, 6px corners, 44px tall. Secondary buttons are white with a grey border. One radius (6px) everywhere.
+- Links in text are ink-coloured and underlined, and take a pale highlighter background on hover.
+- No icons, gradients, shadows on resting surfaces, glass, emoji, uppercase labels, scores or decorative security imagery. The toast is the only element with a shadow because it floats.
+- Focus is a 3px ink outline with a 2px gap on every interactive element.
+- Motion is limited to short colour transitions on hover and a 1px press on buttons, and is removed when reduced motion is requested.
 
-## Behavior and presentation rules
+## Behaviour and honesty rules
 
-Use actual session state. Never seed incidents, counts, findings, or activity. Keep user-provided content separate from platform guidance and system-generated labels. A hash is a fingerprint, not identity or deepfake detection. URL checks do not fetch the address or declare it safe. Reporting guidance is not a decision, and the app never submits a report. Empty, error, unsaved, and storage states must say what happened and what the user can do next.
+Use real session state only: never seed incidents, counts or activity. A fingerprint is a SHA-256 of the bytes, not identity or deepfake detection. The link check reads the address on the device and never opens it, and its warnings are clues, not a safety rating. Reporting routes link to official pages; the app never submits anything. Empty, error, unsaved and locked states say what happened and what to do next. Drafts survive navigation, and leaving with unsaved work asks first.
 
-The Taste Skill's [app-screen guidance](https://raw.githubusercontent.com/Leonxlnx/taste-skill/main/skills/taste-skill/references/app-screens.md) informed the task-first hierarchy: the screen's main question comes first, controls stay labeled, and zero/error states remain honest. The product brief determines this palette and layout.
+## References
 
-Rare UI was inspected as a reference only. Its [public repository](https://github.com/swamimalode07/rare-ui) describes an animated React/Next.js, Tailwind, and TypeScript shadcn registry; its README states an MIT license with a Commons Clause and attribution requirements. The [Popy Rare UI skill listing](https://skills.popy.app/skills/popy-rare-ui) advertises a [raw skill bundle](https://raw.githubusercontent.com/popyapp/agent-skills/main/rare-ui/SKILL.md), but that bundle URL returned 404 when checked. No Rare UI component, package, skill file, or license text was copied or installed.
+The Taste Skill (`SKILL.md` and its app-screen chapter) was read as guidance. Taken from it: one question per screen, a noun title on each page, the answer figure largest (the destination hostname), colour only where it carries meaning, a near-black primary button, honest empty states, tone steps instead of extra boxes, one radius, and a phone layout of its own. Its scripts, inspector and asset search were not run, and no library code was copied.
+
+Rare UI's public README was read as a reference only. It describes an animated React/Next.js, Tailwind and TypeScript shadcn registry under MIT with a Commons Clause and an attribution requirement; its separate Popy skill bundle was not available. This project uses plain HTML, CSS and ES modules, so no Rare UI component, package, skill file or license text was installed or copied.

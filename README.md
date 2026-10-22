@@ -32,6 +32,6 @@ Session data may disappear when the tab closes. Encrypted browser storage and ex
 
 ## Project status
 
-Version 0.5.0 uses a task-first blue-white workbench. Start presents response paths first, keeps link review close at hand, and leaves file fingerprinting as a secondary tool. The MIT-licensed source, tests and documentation are published at [anon5376/usualCyberSec](https://github.com/anon5376/usualCyberSec). A source ZIP is also available from the site.
+Version 0.5.0 uses a plain single-column interface: black text on white with one highlighter-yellow accent. Home asks what is going on, offers six response paths, and includes a working link checker; file fingerprinting, incidents, guides and your data are one click away. The MIT-licensed source, tests and documentation are published at [anon5376/usualCyberSec](https://github.com/anon5376/usualCyberSec). A source ZIP is also available from the site.
 
 Read [the verification record](docs/VERIFICATION.md), [remaining work](docs/ROADMAP.md), [privacy notes](docs/PRIVACY.md), and [threat model](docs/THREAT-MODEL.md) for the supported behavior and its limits. CI status is available in the repository’s Actions tab; a configured workflow alone is not proof that a run passed.

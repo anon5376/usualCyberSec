@@ -74,3 +74,15 @@ Checked 2026-10-22. The start page now leads with response situations and a work
 - Independent review found no blocking visual issue in the five supplied home/report captures. It found a two-tab status regression: after another tab saved and deleted a vault, an empty tab could claim a saved vault was locked. The production storage-handler regression failed on that old behavior and passed after adding an explicit changed-in-another-tab state. The reviewer marked that finding resolved.
 
 File hashing and encryption were covered by the native suite; browser file selection, encrypted saving, and report-file downloads were not repeated in this design pass. Publication and asset-byte checks are retained separately in the release receipt.
+
+## Accepted Opus interface (0.6)
+
+Checked 2026-10-22. A fresh Claude Opus 5.5 session implemented the accepted white, black, and yellow interface. Its eight authored files were integrated without changing the design. Core hashing, URL analysis, records, encryption, draft helpers, vault storage, reporting data, and security headers remain byte-identical to 0.5.
+
+- The candidate passed all 20 JavaScript tests, rerun independently before integration. The integrated release passed both Python server tests and the source-package test. JavaScript syntax and authored diff checks passed. No dependencies or code comments were added.
+- Independent integration review found no material issue in the changed templates, form hooks, escaping, navigation, or keyboard semantics. Ten targeted hostname-rendering probes covered credentials, repeated `@`, ports, IPv6, trailing dots, encoded hosts, and markup.
+- Real-browser checks identified the destination hostname and expected-domain mismatch in a synthetic URL. Creating an incident from that result retained the findings. A completed checklist step survived encrypted browser save, lock, and unlock with a disposable test passphrase.
+- The reporting preview initially excluded optional incident details. Selecting the summary included it. Keyboard activation of Skip to content focused the current main region and preserved the report route and selected disclosure.
+- Home screenshots were inspected at 1440px, 768px, and 390px, with document width matching each viewport. The report also matched a 320px viewport. No browser warning/error logs appeared during these checks. These checks do not constitute screen-reader validation or a complete browser matrix.
+
+Browser file selection and download completion were not repeated; the unchanged hashing and export logic remain covered by native tests. Publication, hosted CI, archive reproducibility, and deployed-byte checks are recorded in the release receipt.
