@@ -20,3 +20,12 @@ test('discard guards recognize draft text, selected category and pending files',
   assert.equal(hasPendingDrafts(emptyDraft(),new File(['abc'],'evidence.txt')),true);
   assert.equal(hasPendingDrafts({...emptyDraft(),title:'   '},null),false);
 });
+
+test('discard guards include saved-case edits and acquisition context drafts',()=>{
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{caseA:{summary:'unsaved'}},{}),true);
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{caseA:{summary:''}},{}),true);
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{}, {caseId:'caseA'}),true);
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{}, {notes:'unsaved'}),true);
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{}, {sourceUrl:'https://example.test'}),true);
+  assert.equal(hasPendingDrafts(emptyDraft(),null,{}, {caseId:'',notes:'   ',sourceUrl:''}),false);
+});

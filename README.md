@@ -16,7 +16,7 @@ Open `http://127.0.0.1:8765/`. The local server binds only to loopback and serve
 
 ## Cloudflare Pages deployment
 
-The hosting target is `usualcybersec.pages.dev`. The `dist/_headers` file applies the same content security policy and browser security headers as the local server. See [the release checklist](docs/RELEASE.md) for Cloudflare's [Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/) steps. Direct Upload requires an authenticated Cloudflare account. Wrangler is optional deployment tooling, not an application dependency. Use the Cloudflare dashboard or an existing Wrangler installation.
+The public app is at [usualcybersec.pages.dev](https://usualcybersec.pages.dev). The `dist/_headers` file applies the same content security policy and browser security headers as the local server. See [the release checklist](docs/RELEASE.md) for Cloudflare's [Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/) steps. Direct Upload requires an authenticated Cloudflare account. Wrangler is optional deployment tooling, not an application dependency. Use the Cloudflare dashboard or an existing Wrangler installation.
 
 ## What it can and cannot do
 
@@ -30,4 +30,4 @@ Session data may disappear when the tab closes. Encrypted browser storage and ex
 
 ## Project status
 
-Version 0.3 adds platform reporting/recovery guidance and selective report packets to the action-first workbench, preserved tool drafts, and responsive design introduced in 0.2. The site includes a downloadable MIT source archive. A canonical GitHub repository is pending owner approval. `usualcybersec.pages.dev` is the requested hosting target; this README does not claim a public deployment is live. Read [the executed verification record](docs/VERIFICATION.md), [remaining work](docs/ROADMAP.md), [privacy notes](docs/PRIVACY.md), and [threat model](docs/THREAT-MODEL.md) for the supported behavior and its limits.
+Version 0.3 adds platform reporting/recovery guidance and selective report packets to the action-first workbench, preserved tool drafts, and responsive design introduced in 0.2. Patch 0.3.1 preserves unsaved edits and acquisition notes across navigation, fixes keyboard skip navigation, and supports long content at 320px. The site includes a downloadable MIT source archive. A canonical GitHub repository is pending owner approval. The MIT source archive is publicly downloadable from the app. Local release receipts retain deployment identifiers and byte comparisons; GitHub-hosted CI has not run. Read [the executed verification record](docs/VERIFICATION.md), [remaining work](docs/ROADMAP.md), [privacy notes](docs/PRIVACY.md), and [threat model](docs/THREAT-MODEL.md) for the supported behavior and its limits.

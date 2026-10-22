@@ -38,3 +38,15 @@ Checked 2026-10-22. `npm test` passed 19/19; `npm run test:server` passed 2/2; `
 - Source notes retain official URLs and access caveats. No account recovery, platform submission, identity-document upload or takedown was performed. No automated detector or C2PA verification is introduced by this release.
 
 Public deployment availability and byte equality are retained separately in the local release receipt.
+
+## Draft retention and accessibility patch (0.3.1)
+
+Checked 2026-10-22. The full native suite passed 20/20 JavaScript tests, 2/2 Python server tests and 1/1 source-package test. The subsequent CSS-only wrapping changes were checked in the browser; authored diff checks passed. No dependency was added.
+
+- Keyboard activation of Skip to workspace previously changed a Guides URL to `#main` and rendered the Workbench. It now focuses the current main region without route changes or re-rendering. Browser verification on an unsaved incident form retained its route and inputs.
+- A 200-character unbroken incident title previously expanded a 320px page to 4169px. Long titles, summaries and source URLs now wrap; the final case and Workbench document widths matched their 320px viewport. Narrow masthead details yield space to the four navigation destinations and readable task labels. Desktop case actions retained readable widths.
+- Saved-case edits and file acquisition context now survive navigation. Production-event regression coverage begins with a clean encrypted-save baseline, checks that an edit alone triggers the unload guard, verifies saved case data stays unchanged until submission, and exercises save/cancel, attachment destination/context retention, attachment completion and file replacement. Independent review also verified revert/delete/lock/restore behavior.
+- Async failures that finish after their form is removed now appear in the current-page notification. A pending hash read that rejects after navigation exercises that path.
+- Firefox on macOS was used through its actual UI to create a synthetic case, edit its summary, navigate away and back, and save the retained draft at 200% browser zoom. The form and action area were visually inspected. The temporary zoom override was reset. Firefox also displayed its unsaved-data warning when closing the synthetic session. This is bounded second-browser evidence, not a complete browser matrix or screen-reader evaluation.
+
+No material correctness finding remained in the focused follow-up review. Automated media detection, C2PA verification, public contribution/private vulnerability channels, and broader independent validation remain open in ROADMAP.md.

@@ -7,6 +7,8 @@ export function startIncidentDraft(draft, initialType) {
   return {...draft, type:['deepfake','impersonation','phishing','breach'].includes(initialType)?initialType:draft.type, initialized:true};
 }
 
-export function hasPendingDrafts(draft, file) {
-  return Boolean(file || ['url','expected','fingerprint','title','summary','sourceUrl'].some(key=>draft[key]?.trim()) || draft.type!=='deepfake');
+export function hasPendingDrafts(draft, file, caseEditDrafts = {}, attachmentDraft = {}) {
+  const hasCaseEdit = Object.values(caseEditDrafts).some(fields => fields && Object.keys(fields).length > 0);
+  const hasAttachmentContext = Boolean(attachmentDraft.caseId || attachmentDraft.sourceUrl?.trim() || attachmentDraft.notes?.trim());
+  return Boolean(file || hasCaseEdit || hasAttachmentContext || ['url','expected','fingerprint','title','summary','sourceUrl'].some(key=>draft[key]?.trim()) || draft.type!=='deepfake');
 }

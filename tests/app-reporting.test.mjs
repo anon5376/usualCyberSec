@@ -4,7 +4,7 @@ import { webcrypto } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 test('production app resets report state on every changed report URL and accepts disclosure changes while busy', async () => {
-  const globalNames = ['document', 'window', 'location', 'localStorage', 'FormData', 'crypto', 'setTimeout', 'clearTimeout'];
+  const globalNames = ['document', 'window', 'location', 'localStorage', 'navigator', 'FormData', 'DataTransfer', 'crypto', 'setTimeout', 'clearTimeout'];
   const previousDescriptors = new Map(globalNames.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
   const nodes = new Map();
   const documentListeners = new Map();
@@ -13,6 +13,7 @@ test('production app resets report state on every changed report URL and accepts
   const node = selector => {
     if (!nodes.has(selector)) nodes.set(selector, {
       innerHTML: '', textContent: '', hidden: false,
+      isConnected: true,
       classList: { toggle() {} },
       focus() {}, setAttribute() {}, removeAttribute() {}, reset() {},
       querySelectorAll() { return [{ disabled: false }]; },
@@ -32,13 +33,23 @@ test('production app resets report state on every changed report URL and accepts
     scrollTo() {},
     },
     location: { get hash() { return hash; }, set hash(value) { hash = value.startsWith('#') ? value : `#${value}`; } },
-    localStorage: { getItem() { return null; } },
+    localStorage: {
+      data: new Map(),
+      getItem(key) { return this.data.get(key) ?? null; },
+      setItem(key, value) { this.data.set(key, value); },
+      removeItem(key) { this.data.delete(key); },
+    },
+    navigator: { locks: { async request(_key, callback) { return callback(); } } },
     crypto: webcrypto,
     setTimeout: () => 1,
     clearTimeout: () => {},
     FormData: class {
     constructor(form) { this.form = form; }
     get(key) { return this.form.values?.[key] ?? null; }
+    },
+    DataTransfer: class {
+      constructor() { this.entries = []; this.items = { add: file => this.entries.push(file) }; }
+      get files() { return this.entries; }
     },
   };
   for (const [name, value] of Object.entries(replacements)) {
@@ -50,7 +61,9 @@ test('production app resets report state on every changed report URL and accepts
     await import(`${appUrl.href}?test=${Date.now()}`);
     const renderOnHashChange = windowListeners.get('hashchange');
     const change = documentListeners.get('change');
+    const input = documentListeners.get('input');
     const submit = documentListeners.get('submit');
+    const click = documentListeners.get('click');
     const main = node('#main');
 
     const form = node('case-form-instance');
@@ -67,6 +80,27 @@ test('production app resets report state on every changed report URL and accepts
     assert.match(caseHash, /^#case\//);
     renderOnHashChange();
     const caseId = decodeURIComponent(caseHash.slice('#case/'.length));
+
+    const saveWorkspace = async () => {
+      const saveForm = node('save-form-instance');
+      saveForm.id = 'save-form';
+      saveForm.values = { password: 'test passphrase long enough', confirm: 'test passphrase long enough' };
+      saveForm.querySelectorAll = () => [button];
+      saveForm.reset = () => {};
+      await submit({ target: saveForm, submitter: { value: 'local' }, preventDefault() {} });
+    };
+    globalThis.location.hash = '#new';
+    renderOnHashChange();
+    const secondCaseForm = node('second-case-form');
+    secondCaseForm.id = 'case-form';
+    secondCaseForm.dataset = { id: '' };
+    secondCaseForm.values = { title: 'Second case', type: 'breach', summary: '', sourceUrl: '' };
+    secondCaseForm.querySelectorAll = () => [button];
+    await submit({ target: secondCaseForm, preventDefault() {} });
+    const secondCaseHash = globalThis.location.hash;
+    const secondCaseId = decodeURIComponent(secondCaseHash.slice('#case/'.length));
+    renderOnHashChange();
+    await saveWorkspace();
 
     const enterReport = async hash => {
       globalThis.location.hash = hash;
@@ -133,6 +167,111 @@ test('production app resets report state on every changed report URL and accepts
     renderOnHashChange();
     assert.doesNotMatch(main.innerHTML, /data-report-field="summary" checked/);
     assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
+
+    // Attachment context and a deliberately non-default case selection survive navigation.
+    globalThis.location.hash = '#evidence';
+    renderOnHashChange();
+    const attachForm = { id: 'attach-form' };
+    const selectAttachmentCase = { id: 'attach-case', value: caseId, closest() { return null; }, matches() { return false; } };
+    change({ target: selectAttachmentCase });
+    input({ target: { id: 'evidence-source', name: 'sourceUrl', value: 'https://source.example/post', closest(selector) { return selector === 'form' ? attachForm : null; } } });
+    input({ target: { id: 'evidence-notes', name: 'notes', value: 'received from a colleague', closest(selector) { return selector === 'form' ? attachForm : null; } } });
+    globalThis.location.hash = '#library';
+    renderOnHashChange();
+    globalThis.location.hash = '#evidence';
+    renderOnHashChange();
+    assert.match(main.innerHTML, new RegExp(`value="${caseId}" selected`));
+    assert.match(main.innerHTML, /value="https:\/\/source\.example\/post"/);
+    assert.match(main.innerHTML, /received from a colleague/);
+
+    // Replacing the selected file clears its old acquisition context before the next fingerprint is shown.
+    const replacementFile = { name: 'replacement.bin', size: 1, type: 'application/octet-stream', lastModified: 2, async arrayBuffer() { return new Uint8Array([2]).buffer; } };
+    change({ target: { id: 'media-file', files: [replacementFile], closest() { return null; }, matches() { return false; } } });
+    const replacementHashForm = node('replacement-hash-form');
+    replacementHashForm.id = 'hash-form';
+    replacementHashForm.values = { file: replacementFile, expected: '' };
+    replacementHashForm.querySelectorAll = () => [button];
+    await submit({ target: replacementHashForm, preventDefault() {} });
+    renderOnHashChange();
+    assert.doesNotMatch(main.innerHTML, /source\.example\/post|received from a colleague/);
+    assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
+
+    // A successful attach uses the new context and clears the form for the next file.
+    input({ target: { id: 'evidence-source', name: 'sourceUrl', value: 'https://new.example/item', closest(selector) { return selector === 'form' ? attachForm : null; } } });
+    input({ target: { id: 'evidence-notes', name: 'notes', value: 'new acquisition details', closest(selector) { return selector === 'form' ? attachForm : null; } } });
+    const attachSubmit = node('attach-submit-form');
+    attachSubmit.id = 'attach-form';
+    attachSubmit.values = { caseId: secondCaseId, sourceUrl: 'https://new.example/item', notes: 'new acquisition details' };
+    attachSubmit.querySelectorAll = () => [button];
+    await submit({ target: attachSubmit, preventDefault() {} });
+    globalThis.location.hash = `#case/${encodeURIComponent(secondCaseId)}`;
+    renderOnHashChange();
+    assert.match(main.innerHTML, /new\.example\/item/);
+    assert.match(main.innerHTML, /new acquisition details/);
+    globalThis.location.hash = '#evidence';
+    renderOnHashChange();
+    assert.doesNotMatch(main.innerHTML, /new\.example\/item|new acquisition details/);
+
+    // A late hashing failure after navigation reports into the currently visible chrome.
+    let rejectRead;
+    const failingRead = new Promise((_resolve, reject) => { rejectRead = reject; });
+    const failingFile = { name: 'failure.bin', size: 1, type: 'application/octet-stream', lastModified: 3, async arrayBuffer() { await failingRead; } };
+    const lateErrorForm = node('late-error-form');
+    lateErrorForm.id = 'hash-form';
+    lateErrorForm.values = { file: failingFile, expected: '' };
+    lateErrorForm.querySelectorAll = () => [button];
+    const detachedError = { textContent: '', hidden: true, isConnected: false };
+    lateErrorForm.querySelector = () => detachedError;
+    const lateFailure = submit({ target: lateErrorForm, preventDefault() {} });
+    globalThis.location.hash = '#library';
+    renderOnHashChange();
+    rejectRead(new Error('late hash read failed'));
+    await lateFailure;
+    assert.match(node('#notice').textContent, /late hash read failed/);
+    assert.equal(detachedError.textContent, '');
+    await saveWorkspace();
+    change({ target: { id: 'media-file', files: [], closest() { return null; }, matches() { return false; } } });
+    // Existing case edit input is retained across navigation, stays separate from saved state, and warns before unload.
+    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    const editForm = { id: 'case-form', dataset: { id: caseId } };
+    input({ target: { id: 'case-summary', name: 'summary', value: 'final-edit-draft', closest(selector) { return selector === 'form' ? editForm : null; } } });
+    assert.equal(node('#storage-state').textContent, 'Unsaved draft');
+    let unloadPrevented = false;
+    windowListeners.get('beforeunload')({ preventDefault() { unloadPrevented = true; } });
+    assert.equal(unloadPrevented, true);
+    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    assert.match(main.innerHTML, /summary-secret-during-save/);
+    assert.doesNotMatch(main.innerHTML, /final-edit-draft/);
+    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    assert.match(main.innerHTML, /final-edit-draft/);
+
+    const saveEditForm = node('edit-submit-form');
+    saveEditForm.id = 'case-form';
+    saveEditForm.dataset = { id: caseId };
+    saveEditForm.values = { title: 'Case title', type: 'deepfake', summary: 'final-edit-draft', sourceUrl: '' };
+    saveEditForm.querySelectorAll = () => [button];
+    await submit({ target: saveEditForm, preventDefault() {} });
+    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    assert.match(main.innerHTML, /final-edit-draft/);
+    await saveWorkspace();
+
+    // Cancel explicitly discards the next edit draft.
+    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    input({ target: { id: 'case-summary', name: 'summary', value: 'cancelled-summary-draft', closest(selector) { return selector === 'form' ? editForm : null; } } });
+    click({ target: { closest(selector) { return selector === '[data-action]' ? { dataset: { action: 'cancel-edit', id: caseId } } : null; } } });
+    globalThis.location.hash = `#case/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
+    renderOnHashChange();
+    assert.match(main.innerHTML, /final-edit-draft/);
+    assert.doesNotMatch(main.innerHTML, /cancelled-summary-draft/);
+
+
   } finally {
     for (const [name, descriptor] of previousDescriptors) {
       if (descriptor) Object.defineProperty(globalThis, name, descriptor);
