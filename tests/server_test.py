@@ -1,5 +1,3 @@
-"""Behavior checks for the local-only static server."""
-
 import http.client
 import importlib.util
 import threading

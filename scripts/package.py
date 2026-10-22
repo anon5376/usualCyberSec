@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-"""Create a repeatable ZIP containing usualCyberSec's source and documentation."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,7 +8,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "usualcybersec-source.zip"
-ROOT_FILES = {".gitignore", "CONTRIBUTING.md", "LICENSE", "PRODUCT.md", "README.md", "SECURITY.md", "package.json"}
+ROOT_FILES = {".gitignore", "CONTRIBUTING.md", "DESIGN.md", "LICENSE", "PRODUCT.md", "README.md", "SECURITY.md", "package.json"}
 SOURCE_DIRS = {".github", "docs", "scripts", "tests", "dist"}
 SOURCE_SUFFIXES = {".css", ".html", ".js", ".json", ".mjs", ".md", ".png", ".py", ".svg", ".toml", ".ttf", ".txt", ".woff2", ".yml", ".yaml"}
 SOURCE_FILENAMES = {"_headers", "_redirects"}

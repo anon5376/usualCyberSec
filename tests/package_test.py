@@ -1,5 +1,3 @@
-"""Archive-level checks for the source distribution allowlist."""
-
 import importlib.util
 from pathlib import Path
 import tempfile
@@ -25,10 +23,8 @@ class PackageArchiveTests(unittest.TestCase):
                 "dist/core.mjs": "export {};\n",
                 "dist/vault.mjs": "export {};\n",
                 "dist/_headers": "/*\n  X-Frame-Options: DENY\n",
-                "dist/fonts/SpaceGrotesk[wght].ttf": "font bytes\n",
-                "dist/fonts/SpaceGrotesk-OFL.txt": "SIL OPEN FONT LICENSE\n",
-                "dist/fonts/IBMPlexMono-Regular.ttf": "font bytes\n",
-                "dist/fonts/IBMPlexMono-OFL.txt": "SIL OPEN FONT LICENSE\n",
+                "dist/icon.svg": "<svg></svg>\n",
+                "dist/NOTICE.txt": "Third-party license notices\n",
                 "tests/vault.test.mjs": "import 'node:test';\n",
                 "docs/credentials/token.md": "private\n",
                 "docs/archives/old.md": "generated\n",
@@ -54,10 +50,8 @@ class PackageArchiveTests(unittest.TestCase):
                 self.assertIn("usualcybersec/dist/core.mjs", names)
                 self.assertIn("usualcybersec/dist/vault.mjs", names)
                 self.assertIn("usualcybersec/dist/_headers", names)
-                self.assertIn("usualcybersec/dist/fonts/SpaceGrotesk[wght].ttf", names)
-                self.assertIn("usualcybersec/dist/fonts/SpaceGrotesk-OFL.txt", names)
-                self.assertIn("usualcybersec/dist/fonts/IBMPlexMono-Regular.ttf", names)
-                self.assertIn("usualcybersec/dist/fonts/IBMPlexMono-OFL.txt", names)
+                self.assertIn("usualcybersec/dist/icon.svg", names)
+                self.assertIn("usualcybersec/dist/NOTICE.txt", names)
                 self.assertIn("usualcybersec/tests/vault.test.mjs", names)
                 self.assertFalse(any("credentials" in name or "/archives/" in name or ".openai" in name for name in names))
                 self.assertFalse(any(name.endswith("usualcybersec-source.zip") or name.endswith("prooflane-source.zip") for name in names))

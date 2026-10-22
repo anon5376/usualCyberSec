@@ -50,3 +50,15 @@ Checked 2026-10-22. The full native suite passed 20/20 JavaScript tests, 2/2 Pyt
 - Firefox on macOS was used through its actual UI to create a synthetic case, edit its summary, navigate away and back, and save the retained draft at 200% browser zoom. The form and action area were visually inspected. The temporary zoom override was reset. Firefox also displayed its unsaved-data warning when closing the synthetic session. This is bounded second-browser evidence, not a complete browser matrix or screen-reader evaluation.
 
 No material correctness finding remained in the focused follow-up review. Automated media detection, C2PA verification, public contribution/private vulnerability channels, and broader independent validation remain open in ROADMAP.md.
+
+## Simple interface and public source (0.4)
+
+Checked 2026-10-22. The owner authorized a public repository named usualCyberSec and requested a much simpler interface plus removal of code comments. The white/system-font interface replaces the dark workbench styling. The five browser modules and their privacy behavior are unchanged. Font assets are no longer used or distributed.
+
+- `npm test`: 20/20 passed. `npm run test:server`: 2/2 passed. `python3 -m unittest tests/package_test.py`: 1/1 passed. Server help and authored diff checks passed.
+- Browser checks performed a deceptive URL review, created a case from it, opened the compatible Google recovery packet, and confirmed its default preview excluded incident text. Workbench, reporting and vault documents each matched a 320px viewport. Desktop appearance was visually inspected. No browser warnings/errors were observed.
+- Independent diff review found no material issue; it verified the inventory, asset references, comment removal, archive test and server help.
+- Explanatory JavaScript/Python comments, module docstrings and the gitignore comment were removed. The two Python shebang directives remain executable metadata; MIT license text and ordinary Markdown documentation remain. `_headers` begins with a URL wildcard, not a comment.
+- A pre-publication scan of 61 historical text blobs found no matches for the checked credential signatures, and no private/generated release paths were tracked. This is a bounded publication check, not a complete secret or security audit.
+
+GitHub push, hosted CI and the Pages byte-comparison result are retained in the release receipt. A workflow file alone does not establish passing hosted CI. The private vulnerability-report setting remains disabled pending explicit approval.

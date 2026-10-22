@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-"""Serve usualCyberSec's built static files on loopback for local use."""
-
 from __future__ import annotations
 
 import argparse
@@ -45,7 +43,7 @@ class usualCyberSecHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description="Serve usualCyberSec's built static files on loopback for local use.")
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
     if not 0 <= args.port <= 65535:

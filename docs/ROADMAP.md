@@ -12,7 +12,7 @@ For a selected case and route, the app can preview and download a plain-text pac
 
 There is no country or jurisdiction selector, location-aware routing, or localized directory. Users must inspect the selected platform’s current instructions themselves. TikTok’s source describes separate U.S. and non-U.S. impersonation paths, but usualCyberSec does not choose between them. Google and Microsoft also distinguish organization-managed accounts from personal account recovery. Platform forms, eligibility, and identity requirements may vary or change; some linked pages could not be read while logged out during source verification.
 
-- Establish a public contribution and private vulnerability-reporting channel after the owner approves the GitHub destination.
+- Public source and contribution channels are available at https://github.com/anon5376/usualCyberSec. A private vulnerability-reporting channel still needs explicit owner authorization.
 - Validate usability and accessibility with people using assistive technologies and multiple browsers.
 - Evaluate optional local deepfake models against representative, independently labeled data before selecting a model or making accuracy claims. Model size, license, subgroup performance, failure modes, browser support, and additional dependencies require explicit decisions.
 - Add C2PA signature verification only with a maintained implementation and clear trust-chain boundaries. Missing credentials must not imply fake media.

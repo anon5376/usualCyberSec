@@ -9,4 +9,4 @@ npm test
 npm run test:server
 ```
 
-For behavior changes, include focused tests at the observable boundary. Keep reports, evidence, credentials, local archives, and generated ZIPs out of source control. Describe user-visible behavior, privacy effects, and limitations in the change summary. No public repository URL or contribution contact channel is configured yet.
+For behavior changes, include focused tests at the observable boundary. Keep reports, evidence, credentials, local archives, and generated ZIPs out of source control. Describe user-visible behavior, privacy effects, and limitations in the change summary. The public repository is [anon5376/usualCyberSec](https://github.com/anon5376/usualCyberSec). Use its pull requests for code changes and [issues](https://github.com/anon5376/usualCyberSec/issues) for non-sensitive bugs and feature requests. See SECURITY.md before reporting a vulnerability.

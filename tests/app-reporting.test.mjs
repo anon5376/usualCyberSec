@@ -126,18 +126,15 @@ test('production app resets report state on every changed report URL and accepts
     assert.match(main.innerHTML, /summary-secret-during-save/);
     assert.match(main.innerHTML, /data-report-field="summary" checked/);
 
-    // A same-route render is not a new report entry and must preserve the user's choices.
     renderOnHashChange();
     assert.match(main.innerHTML, /data-report-field="summary" checked/);
 
-    // Entering the generic guide while selected must clear that case and its disclosure.
     await enterReport('#report');
     assert.match(main.innerHTML, /href="#new"/);
     assert.match(main.innerHTML, /href="#vault"/);
     assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
     assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
 
-    // Re-select the sensitive field, then enter a changed but unresolved case URL.
     await enterReport(`#report/${encodeURIComponent(caseId)}`);
     fireChange(reportControl('report-route', 'youtube-privacy'));
     fireChange(summaryToggle);
@@ -145,7 +142,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
     assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
 
-    // Reselect the case, then begin a real hash operation whose file read remains pending.
     await enterReport(`#report/${encodeURIComponent(caseId)}`);
     fireChange(reportControl('report-route', 'youtube-privacy'));
     fireChange(summaryToggle);
@@ -168,7 +164,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.doesNotMatch(main.innerHTML, /data-report-field="summary" checked/);
     assert.doesNotMatch(main.innerHTML, /summary-secret-during-save/);
 
-    // Attachment context and a deliberately non-default case selection survive navigation.
     globalThis.location.hash = '#evidence';
     renderOnHashChange();
     const attachForm = { id: 'attach-form' };
@@ -184,7 +179,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.match(main.innerHTML, /value="https:\/\/source\.example\/post"/);
     assert.match(main.innerHTML, /received from a colleague/);
 
-    // Replacing the selected file clears its old acquisition context before the next fingerprint is shown.
     const replacementFile = { name: 'replacement.bin', size: 1, type: 'application/octet-stream', lastModified: 2, async arrayBuffer() { return new Uint8Array([2]).buffer; } };
     change({ target: { id: 'media-file', files: [replacementFile], closest() { return null; }, matches() { return false; } } });
     const replacementHashForm = node('replacement-hash-form');
@@ -196,7 +190,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.doesNotMatch(main.innerHTML, /source\.example\/post|received from a colleague/);
     assert.doesNotMatch(main.innerHTML, new RegExp(`value="${caseId}" selected`));
 
-    // A successful attach uses the new context and clears the form for the next file.
     input({ target: { id: 'evidence-source', name: 'sourceUrl', value: 'https://new.example/item', closest(selector) { return selector === 'form' ? attachForm : null; } } });
     input({ target: { id: 'evidence-notes', name: 'notes', value: 'new acquisition details', closest(selector) { return selector === 'form' ? attachForm : null; } } });
     const attachSubmit = node('attach-submit-form');
@@ -212,7 +205,6 @@ test('production app resets report state on every changed report URL and accepts
     renderOnHashChange();
     assert.doesNotMatch(main.innerHTML, /new\.example\/item|new acquisition details/);
 
-    // A late hashing failure after navigation reports into the currently visible chrome.
     let rejectRead;
     const failingRead = new Promise((_resolve, reject) => { rejectRead = reject; });
     const failingFile = { name: 'failure.bin', size: 1, type: 'application/octet-stream', lastModified: 3, async arrayBuffer() { await failingRead; } };
@@ -231,7 +223,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.equal(detachedError.textContent, '');
     await saveWorkspace();
     change({ target: { id: 'media-file', files: [], closest() { return null; }, matches() { return false; } } });
-    // Existing case edit input is retained across navigation, stays separate from saved state, and warns before unload.
     globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
     renderOnHashChange();
     const editForm = { id: 'case-form', dataset: { id: caseId } };
@@ -259,7 +250,6 @@ test('production app resets report state on every changed report URL and accepts
     assert.match(main.innerHTML, /final-edit-draft/);
     await saveWorkspace();
 
-    // Cancel explicitly discards the next edit draft.
     globalThis.location.hash = `#edit/${encodeURIComponent(caseId)}`;
     renderOnHashChange();
     input({ target: { id: 'case-summary', name: 'summary', value: 'cancelled-summary-draft', closest(selector) { return selector === 'form' ? editForm : null; } } });
