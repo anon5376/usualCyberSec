@@ -12,4 +12,6 @@ Inter and Geist are self-hosted as Latin WOFF2 subsets in `public/fonts/`. Their
 
 ## Runtime libraries
 
-The full bundled runtime licenses for React, React DOM, Scheduler, Motion, Framer Motion, Motion DOM, Motion Utils, Lucide React and tslib are retained in `public/third-party-licenses.txt` and served with the built application. The source archive includes exact package and lock manifests for reproducible installation. Arc source provenance does not imply endorsement of this application.
+The bundled runtime licenses for React, React DOM, Scheduler, Motion, Framer Motion, Motion DOM, Motion Utils, Lucide React, tslib, `@contentauth/c2pa-web` and its bundled Adobe packages, `highgain`, `ts-deepmerge`, and the embedded `c2pa-rs` core are retained in `public/third-party-licenses.txt` and served with the built application. The C2PA Rust core is dual-licensed under MIT and Apache License 2.0; both texts are included. The two ISC packages declare ISC in npm metadata but include neither a license file nor a copyright notice; their author metadata and the standard ISC terms are retained in the bundle. The artifacts provide no copyright year or notice text.
+
+The C2PA fixture corpus is separate from the runtime and its attribution and CC BY-SA 4.0 license reference are in `tests/fixtures/c2pa/LICENSE.txt`. Fixture URLs, byte lengths, and hashes are in `tests/fixtures/c2pa/SOURCES.json`. The source archive includes exact package and lock manifests for reproducible installation. Arc source provenance does not imply endorsement of this application.

@@ -1,6 +1,6 @@
 {
   "name": "usualcybersec",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Local-first incident response for suspected deepfakes, impersonation, phishing, and breaches",
   "type": "module",
@@ -13,6 +13,7 @@
     "dev": "vite --host 127.0.0.1"
   },
   "dependencies": {
+    "@contentauth/c2pa-web": "0.15.4",
     "lucide-react": "1.61.0",
     "motion": "14.5.0",
     "react": "19.3.1",

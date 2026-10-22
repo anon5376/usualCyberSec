@@ -6,7 +6,9 @@ usualCyberSec is an early local-first project. It has not received an independen
 
 The public project is [anon5376/usualCyberSec](https://github.com/anon5376/usualCyberSec). Use [GitHub issues](https://github.com/anon5376/usualCyberSec/issues) for non-sensitive bugs. Do not post private evidence, credentials, personal data or sensitive exploit details there.
 
-Private vulnerability reporting is not enabled yet. A private disclosure channel remains an open project gate; no response-time commitment or private contact address is advertised. If people are at immediate risk, use the affected service’s official reporting/recovery process.
+Use GitHub’s [Report a vulnerability](https://github.com/anon5376/usualCyberSec/security/advisories/new) channel for private security reports. Private vulnerability reporting is enabled for this repository. Include a minimal reproduction with synthetic data; keep real incident media, credentials and personal records out of the report. No response-time commitment is advertised.
+
+If people are at immediate risk, use the affected service’s official reporting/recovery process.
 
 ## Current boundaries
 

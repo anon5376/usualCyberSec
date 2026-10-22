@@ -30,6 +30,33 @@ test('report disclosure stays controllable during async work and resets across c
   app.navigate('#report/missing');assert.equal(app.getSnapshot().report.caseId,'');assert.throws(()=>app.packet(),/Choose an incident/);
 });
 
+test('report location changes clear the prior route and disclosures without losing the selected incident',async()=>{
+  const {app}=fixture();const id=incident(app);
+  app.navigate('#report/'+id);
+  assert.equal(app.getSnapshot().report.jurisdiction,'global');
+  app.setReport('jurisdiction','au');
+  app.setReport('routeId','au-esafety-image-abuse');
+  app.setDisclosure('summary',true);
+  assert.match(app.packet(),/Private summary/);
+  assert.match(app.packet(),/eSafety/);
+  assert.throws(()=>app.setReport('jurisdiction','unknown'),/jurisdiction/);
+  assert.equal(app.getSnapshot().report.jurisdiction,'au');
+  let release;const pending=app.run(()=>new Promise(resolve=>{release=resolve;}));
+  app.setReport('jurisdiction','gb-ewni');
+  assert.equal(app.getSnapshot().report.caseId,id);
+  assert.equal(app.getSnapshot().report.routeId,'');
+  assert.deepEqual(app.getSnapshot().report.disclosure,{});
+  app.setReport('routeId','au-esafety-image-abuse');
+  assert.equal(app.getSnapshot().report.routeId,'');
+  app.setReport('routeId','uk-report-fraud');
+  assert.doesNotMatch(app.packet(),/Private summary/);
+  release();await pending;
+  app.navigate('#report/'+id);
+  assert.equal(app.getSnapshot().report.jurisdiction,'gb-ewni');
+  app.navigate('#cases');app.navigate('#report/'+id);
+  assert.equal(app.getSnapshot().report.jurisdiction,'global');
+});
+
 test('incident and attachment drafts survive routes without mutating committed records',()=>{
   const {app}=fixture();const first=incident(app,'First');const second=incident(app,'Second');
   app.setDraft('url','https://expected.example@other.example/');app.setDraft('expected','expected.example');app.setDraft('fingerprint','a'.repeat(64));

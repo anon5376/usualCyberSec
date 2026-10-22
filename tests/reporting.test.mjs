@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   REPORT_FIELDS,
+  REPORTING_JURISDICTIONS,
   REPORTING_ROUTES,
   buildReportingPacket,
   findReportingRoutes,
+  getReportingJurisdiction,
   getReportingRoute,
 } from '../src/lib/reporting.mjs';
 
@@ -32,11 +34,7 @@ const routeCase = {
 };
 
 test('route directory records source metadata and issue filters match eligibility', () => {
-  assert.deepEqual(REPORTING_ROUTES.map(route => route.id).sort(), [
-    'facebook-impersonation', 'google-recovery', 'instagram-impersonation',
-    'microsoft-recovery', 'tiktok-impersonation', 'tiktok-synthetic',
-    'x-impersonation', 'youtube-privacy',
-  ]);
+  assert.equal(new Set(REPORTING_ROUTES.map(route => route.id)).size, REPORTING_ROUTES.length);
   for (const route of REPORTING_ROUTES) {
     assert.match(route.url, /^https:\/\//);
     assert.ok(route.title && route.summary && route.accessNote);
@@ -48,9 +46,55 @@ test('route directory records source metadata and issue filters match eligibilit
     assert.ok(findReportingRoutes(issue).length > 0);
     assert.ok(findReportingRoutes(issue).every(route => route.issues.includes(issue)));
   }
-  assert.equal(findReportingRoutes('all').length, REPORTING_ROUTES.length);
+  assert.ok(findReportingRoutes('all').length > 0);
   assert.throws(() => findReportingRoutes('unknown'), /issue/i);
   assert.equal(getReportingRoute('missing-route'), undefined);
+});
+
+test('regional route eligibility respects selected location while worldwide services remain available', () => {
+  assert.match(getReportingJurisdiction('global').summary, /not exhaustive/i);
+  assert.equal(getReportingJurisdiction('missing'), undefined);
+
+  const ids = jurisdiction => findReportingRoutes('all', jurisdiction).map(route => route.id);
+  assert.deepEqual(ids('global'), REPORTING_ROUTES.filter(route => !route.jurisdictions).map(route => route.id));
+  assert.ok(ids('gb-ewni').includes('uk-report-fraud'));
+  assert.ok(!ids('gb-scotland').includes('uk-report-fraud'));
+  assert.ok(ids('au').includes('au-report-cyber'));
+  assert.ok(ids('au').includes('au-esafety-image-abuse'));
+  assert.ok(!ids('gb-ewni').includes('au-report-cyber'));
+  for (const { id: jurisdiction } of REPORTING_JURISDICTIONS) {
+    assert.ok(ids(jurisdiction).includes('fbi-ic3'));
+    assert.ok(ids(jurisdiction).includes('youtube-privacy'));
+    assert.ok(ids(jurisdiction).includes('stopncii-prevention'));
+    assert.ok(ids(jurisdiction).includes('ncmec-take-it-down'));
+  }
+  assert.ok(findReportingRoutes('deepfake', 'au').includes(getReportingRoute('au-esafety-image-abuse')));
+  assert.ok(!findReportingRoutes('phishing', 'au').some(route => route.id === 'au-esafety-image-abuse'));
+  for (const id of ['stopncii-prevention', 'ncmec-take-it-down']) {
+    const route = getReportingRoute(id);
+    assert.equal(route.kind, 'Sharing prevention');
+    assert.equal(route.action, 'prevent');
+    assert.ok(route.issues.includes('deepfake'));
+    assert.ok(route.issues.includes('impersonation'));
+    assert.ok(!route.issues.includes('phishing'));
+    assert.ok(!route.issues.includes('breach'));
+  }
+  assert.ok(findReportingRoutes('deepfake').some(route => route.id === 'stopncii-prevention'));
+  assert.ok(findReportingRoutes('impersonation').some(route => route.id === 'ncmec-take-it-down'));
+  assert.ok(!findReportingRoutes('phishing').some(route => ['stopncii-prevention', 'ncmec-take-it-down'].includes(route.id)));
+  assert.throws(() => findReportingRoutes('all', 'unknown'), /jurisdiction/i);
+});
+
+test('packet generation enforces route jurisdiction and keeps eligible packets redacted by default', () => {
+  assert.throws(() => buildReportingPacket(routeCase, 'uk-report-fraud'), /jurisdiction/i);
+  assert.throws(() => buildReportingPacket(routeCase, 'au-report-cyber', {}, 'gb-ewni'), /jurisdiction/i);
+  const packet = buildReportingPacket(routeCase, 'au-report-cyber', {}, 'au');
+  assert.ok(packet.includes(getReportingRoute('au-report-cyber').title));
+  assert.ok(!packet.includes('title-secret-sentinel'));
+  assert.ok(!packet.includes('summary-secret-sentinel'));
+  assert.ok(!packet.includes('acquisition-url-secret-sentinel'));
+  assert.ok(!packet.includes('filename-secret-sentinel.txt'));
+  assert.ok(!packet.includes('notes-secret-sentinel'));
 });
 
 test('default packet includes required incident context and route while redacting all optional user data', () => {

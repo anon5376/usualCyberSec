@@ -1,0 +1,32 @@
+[
+  {
+    "file": "adobe-20220124-A.jpg",
+    "url": "https://raw.githubusercontent.com/c2pa-org/public-testfiles/main/legacy/1.4/image/jpeg/adobe-20220124-A.jpg",
+    "bytes": 61720,
+    "sha256": "f999fd78bfe8a83c96e468a078830ba94485bc1bc6fd086fb94a43bd29dd0f23"
+  },
+  {
+    "file": "adobe-20220124-C.jpg",
+    "url": "https://raw.githubusercontent.com/c2pa-org/public-testfiles/main/legacy/1.4/image/jpeg/adobe-20220124-C.jpg",
+    "bytes": 140297,
+    "sha256": "75a8da33f6eaf1e16bf3b42cd78913b22b2e6a671fda217a508b1ba4230ce864"
+  },
+  {
+    "file": "adobe-20220124-E-sig-CA.jpg",
+    "url": "https://raw.githubusercontent.com/c2pa-org/public-testfiles/main/legacy/1.4/image/jpeg/adobe-20220124-E-sig-CA.jpg",
+    "bytes": 178709,
+    "sha256": "0d4c2774f1b7e94b9613bb952b0a76b6a178d22ac6d206d257d2af1376cbbff2"
+  },
+  {
+    "file": "adobe-20220124-E-dat-CA.jpg",
+    "url": "https://raw.githubusercontent.com/c2pa-org/public-testfiles/main/legacy/1.4/image/jpeg/adobe-20220124-E-dat-CA.jpg",
+    "bytes": 178709,
+    "sha256": "dae9d121060cec4b6f27ee8acda85ad461cf75f2261d90b463319b787342d7f9"
+  },
+  {
+    "file": "a-bad-16.jpg",
+    "url": "https://raw.githubusercontent.com/c2pa-org/public-testfiles/ae61d4c5cee15cf641cd9455916c75db81753567/2.2/image/bad/jpeg/a-bad-16.jpg",
+    "bytes": 675492,
+    "sha256": "4fc6cb04e9aa678e5d106d61bf3d536ba4159801f4c21e8a902a21f551c6aa26"
+  }
+]

@@ -9,7 +9,164 @@ export const REPORT_FIELDS = [
   { key: 'notes', label: 'Evidence notes' },
 ];
 
+export const REPORTING_JURISDICTIONS = [
+  { id: 'global', label: 'Worldwide services only', summary: 'This list is not exhaustive. Select a relevant location to see region-specific eligibility.' },
+  { id: 'us', label: 'United States', summary: 'IC3 accepts reports from people in any country, including reports made on another person’s behalf.' },
+  { id: 'gb-ewni', label: 'England, Wales, and Northern Ireland', summary: 'Report Fraud serves England, Wales, and Northern Ireland. Scotland uses Police Scotland 101, as described by Report Fraud.', url: 'https://www.reportfraud.police.uk/reporting-a-fraud/' },
+  { id: 'gb-scotland', label: 'Scotland', summary: 'Report Fraud directs people in Scotland to Police Scotland on 101; use Police Scotland’s official guidance to find the appropriate route.', url: 'https://www.reportfraud.police.uk/reporting-a-fraud/' },
+  { id: 'au', label: 'Australia', summary: 'Report eligible cybercrime through ReportCyber. Intimate image abuse, including some digitally altered material, may be reported to eSafety.' },
+  { id: 'eu', label: 'European Union', summary: 'ENISA lists country-specific cybercrime contacts. Some entries are cyber-response agencies rather than police; check the selected contact’s remit.', url: 'https://www.enisa.europa.eu/topics/cyber-incident-awareness/cyber-first-aid' },
+  { id: 'other', label: 'Other location', summary: 'Use appropriate local police or platform channels and review each service’s eligibility.' },
+];
+
+export function getReportingJurisdiction(id) {
+  return REPORTING_JURISDICTIONS.find(jurisdiction => jurisdiction.id === id);
+}
+
 export const REPORTING_ROUTES = [
+  {
+    id: 'fbi-ic3',
+    label: 'FBI IC3 · Cybercrime complaint',
+    service: 'FBI Internet Crime Complaint Center',
+    title: 'Report cyber-enabled crime to IC3',
+    issues: ['deepfake', 'impersonation', 'phishing', 'breach'],
+    kind: 'Law-enforcement intake',
+    action: 'report',
+    url: 'https://www.ic3.gov/Home/FAQ',
+    summary: 'IC3 accepts complaints about cyber-enabled crime, including fraud, hacking, ransomware, and data breaches. A person in any country may file, including on another person’s behalf. Reports may request contact, address, and transaction details. IC3 analysts review and may share reports with law enforcement or partner agencies.',
+    requirements: [
+      'IC3 does not investigate complaints, promise updates, or provide content removal; a receiving agency decides whether to act.',
+      'IC3 does not accept evidence attachments. Keep original records and provide information requested by the official form.',
+      'For emergencies or time-sensitive events, contact local police directly.',
+    ],
+    steps: [
+      'Read the official FAQ, then open IC3’s File a Complaint process.',
+      'Review the requested information and enter it directly on the official IC3 site.',
+      'Save a copy before leaving the page; the complaint is not emailed to you.',
+    ],
+    region: 'Available to complainants in any country.',
+    checkedAt: '2026-10-22',
+    accessNote: 'A complaint does not guarantee investigation or recovery of money. This tool cannot submit it.',
+  },
+  {
+    id: 'stopncii-prevention',
+    label: 'StopNCII · Adult intimate images',
+    service: 'StopNCII',
+    title: 'Help prevent sharing of adult intimate images',
+    issues: ['deepfake', 'impersonation'],
+    kind: 'Sharing prevention',
+    action: 'prevent',
+    url: 'https://stopncii.org/faq/',
+    summary: 'StopNCII is a free global service for someone depicted in a nude or sexual image who was at least 18 in the image and is 18 or older now. It supports synthetic nude or semi-nude images of you. The service creates hashes locally; participating companies receive hashes, not images. Coverage does not extend across the whole internet or encrypted services, and edited copies may need separate hashes.',
+    requirements: [
+      'Use StopNCII’s own hash process. usualCyberSec SHA-256 fingerprints cannot be used for this service.',
+      'A case number and PIN are provided without requiring an account; an email address is optional. A lost PIN or case number cannot be recovered.',
+      'If content is already posted, also report it to the relevant platform.',
+    ],
+    steps: [
+      'Review StopNCII’s official FAQ and eligibility information.',
+      'Use the official service’s own hash flow; usualCyberSec does not send or submit anything.',
+    ],
+    region: 'Global service; participating companies determine where matching prevention applies.',
+    checkedAt: '2026-10-22',
+    accessNote: 'This service is for sharing prevention, not a guarantee of removal or coverage across all services.',
+  },
+  {
+    id: 'ncmec-take-it-down',
+    label: 'Take It Down · Images made before 18',
+    service: 'National Center for Missing & Exploited Children Take It Down',
+    title: 'Help prevent sharing of explicit images made before age 18',
+    issues: ['deepfake', 'impersonation'],
+    kind: 'Sharing prevention',
+    action: 'prevent',
+    url: 'https://takeitdown.ncmec.org/faq/',
+    summary: 'Take It Down is a free, international, anonymous service for explicit images of yourself captured when you were under 18, even if you are an adult now. NCMEC also recommends it for AI-generated explicit images. You must already have the file on your device; do not download, request, or obtain explicit material to submit. If you no longer have the file, the FAQ directs people to the CyberTipline.',
+    requirements: [
+      'Use the official service’s local hash process. The image stays on your device while a hash is shared with participating partners.',
+      'Matching covers participating partners, not the entire internet or encrypted services; existing posts are not guaranteed to be removed, and the service does not notify you of matches.',
+      'usualCyberSec SHA-256 fingerprints are not used by this service. This app does not collect age or images.',
+    ],
+    steps: [
+      'Review the official FAQ and follow its link to the appropriate form, including the CyberTipline if you no longer have the file.',
+      'Use only the official service’s process; usualCyberSec does not submit images or hashes.',
+    ],
+    region: 'International service for eligible images made when the depicted person was under 18.',
+    checkedAt: '2026-10-22',
+    accessNote: 'Never obtain or download explicit material to use this service; it requires a file already on your device.',
+  },
+  {
+    id: 'uk-report-fraud',
+    label: 'Report Fraud · Cybercrime and fraud',
+    service: 'Report Fraud',
+    title: 'Report suspected cybercrime or fraud in England, Wales, or Northern Ireland',
+    issues: ['deepfake', 'impersonation', 'phishing', 'breach'],
+    jurisdictions: ['gb-ewni'],
+    kind: 'Law-enforcement intake',
+    action: 'report',
+    url: 'https://www.reportfraud.police.uk/reporting-a-fraud/',
+    summary: 'Report Fraud serves England, Wales, and Northern Ireland. Scotland uses Police Scotland 101. Use the suspicious-message, social-media, or website route when you have neither lost money nor responded. Organizations under cyber attack should call 0300 123 2040.',
+    requirements: [
+      'For a crime happening now, call local police on 999 in an emergency or 101 otherwise.',
+      'Report Fraud Analysis Services, overseen by City of London Police, reviews reports; a crime reference and email updates may follow.',
+      'The service does not promise recovery of money or content removal.',
+    ],
+    steps: [
+      'Keep account, source, and transaction context, then open the official guidance.',
+      'Choose the path that matches what happened and review the form fields before sending.',
+      'Submit information directly through the official Report Fraud service.',
+    ],
+    region: 'England, Wales, and Northern Ireland; Scotland is directed to Police Scotland 101.',
+    checkedAt: '2026-10-22',
+    accessNote: 'This is a suspected cybercrime and fraud reporting path, not a general deepfake content removal service.',
+  },
+  {
+    id: 'au-report-cyber',
+    label: 'ReportCyber · Cybercrime',
+    service: 'Australian Cyber Security Centre ReportCyber',
+    title: 'Report suspected cybercrime in Australia',
+    issues: ['deepfake', 'impersonation', 'phishing', 'breach'],
+    jurisdictions: ['au'],
+    kind: 'Law-enforcement intake',
+    action: 'report',
+    url: 'https://www.cyber.gov.au/submit-a-report',
+    summary: 'ReportCyber covers matters such as online scams, personal information loss, identity theft or impersonation, threats or stalking, unauthorized account access, and hacked devices. Choose the individual cybercrime path, not the separate organization incident path with its eligibility thresholds. Enter personal information only in the official service after reviewing its current privacy notice.',
+    requirements: [
+      'A report does not guarantee an investigation or recovery.',
+      'For emergencies call 000. After payment or banking-detail exposure, contact your bank promptly through its official channel.',
+    ],
+    steps: [
+      'Review the official ACSC guidance and select the individual cybercrime report.',
+      'Check the form and eligibility directly on the ACSC site before entering personal information.',
+      'Provide details directly to the official service.',
+    ],
+    region: 'Australia; use the cybercrime reporting path for individuals.',
+    checkedAt: '2026-10-22',
+    accessNote: 'This tool does not send reports or personal information to ACSC.',
+  },
+  {
+    id: 'au-esafety-image-abuse',
+    label: 'eSafety · Intimate image abuse',
+    service: 'eSafety Commissioner',
+    title: 'Report intimate image abuse in Australia',
+    issues: ['deepfake', 'impersonation'],
+    jurisdictions: ['au'],
+    kind: 'Regulator removal',
+    action: 'report',
+    url: 'https://www.esafety.gov.au/key-topics/image-based-abuse/report-image-based-abuse',
+    summary: 'eSafety’s image-based abuse process covers intimate images or videos shared or threatened without consent, including digitally altered deepfakes. It does not cover generic non-sexual fakes or impersonation. Either the affected person or the person sharing or threatening the material must ordinarily live in Australia. A depicted person, authorized helper, or certain guardians may be eligible.',
+    requirements: [
+      'A platform report is not required first. eSafety usually contacts the service to seek removal and may contact police to preserve evidence.',
+      'Anonymous reports are possible but can limit follow-up.',
+    ],
+    steps: [
+      'Preserve the URL, profile details, and related communications.',
+      'Review eSafety’s eligibility guidance and report details.',
+      'Provide information directly to eSafety only after reviewing its official process.',
+    ],
+    region: 'Australia; eligibility depends on the affected person and report circumstances.',
+    checkedAt: '2026-10-22',
+    accessNote: 'Never attach intimate images or identity documents to usualCyberSec.',
+  },
   {
     id: 'youtube-privacy',
     label: 'YouTube · Privacy complaint',
@@ -196,10 +353,13 @@ const DISCLOSURE_KEYS = new Set(REPORT_FIELDS.map(field => field.key));
 const TYPE_LABELS = new Map(TYPES.map(type => [type.id, type.label]));
 const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u2028\u2029\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g;
 
-export function findReportingRoutes(issue = 'all') {
-  if (issue === 'all') return [...REPORTING_ROUTES];
-  if (!ISSUE_IDS.has(issue)) throw new TypeError(`Unknown reporting issue: ${String(issue)}`);
-  return REPORTING_ROUTES.filter(route => route.issues.includes(issue));
+export function findReportingRoutes(issue = 'all', jurisdiction = 'global') {
+  if (!getReportingJurisdiction(jurisdiction)) throw new TypeError(`Unknown reporting jurisdiction: ${String(jurisdiction)}`);
+  if (issue !== 'all' && !ISSUE_IDS.has(issue)) throw new TypeError(`Unknown reporting issue: ${String(issue)}`);
+  return REPORTING_ROUTES.filter(route =>
+    (issue === 'all' || route.issues.includes(issue))
+    && (!route.jurisdictions || route.jurisdictions.includes(jurisdiction))
+  );
 }
 
 export function getReportingRoute(id) {
@@ -227,10 +387,14 @@ function addUserValue(lines, label, value) {
   for (const line of logicalLines) lines.push(`  | ${line}`);
 }
 
-export function buildReportingPacket(incidentCase, routeId, disclosure = {}) {
+export function buildReportingPacket(incidentCase, routeId, disclosure = {}, jurisdiction = 'global') {
   validateWorkspace({ version: 1, cases: [incidentCase] });
+  if (!getReportingJurisdiction(jurisdiction)) throw new TypeError(`Unknown reporting jurisdiction: ${String(jurisdiction)}`);
   const route = getReportingRoute(routeId);
   if (!route) throw new TypeError(`Unknown reporting route: ${String(routeId)}`);
+  if (route.jurisdictions && !route.jurisdictions.includes(jurisdiction)) {
+    throw new TypeError(`Reporting route ${route.id} is not available for jurisdiction ${jurisdiction}.`);
+  }
   if (!route.issues.includes(incidentCase.type)) {
     throw new TypeError(`Reporting route ${route.id} does not apply to case type ${incidentCase.type}.`);
   }
